@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.UI", "DCI.Social.UI\DCI.Social.UI.csproj", "{C7E23F5A-A805-4544-9FFC-3FEE3151C497}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.Identity", "DCI.Social.Identity\DCI.Social.Identity.csproj", "{0388C19A-B45A-4770-A16E-542D7A6BEA2A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C7E23F5A-A805-4544-9FFC-3FEE3151C497}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7E23F5A-A805-4544-9FFC-3FEE3151C497}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7E23F5A-A805-4544-9FFC-3FEE3151C497}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7E23F5A-A805-4544-9FFC-3FEE3151C497}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0388C19A-B45A-4770-A16E-542D7A6BEA2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0388C19A-B45A-4770-A16E-542D7A6BEA2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0388C19A-B45A-4770-A16E-542D7A6BEA2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0388C19A-B45A-4770-A16E-542D7A6BEA2A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D834D4A8-F8CF-457C-85B8-53677F74D27C}
+	EndGlobalSection
+EndGlobal
