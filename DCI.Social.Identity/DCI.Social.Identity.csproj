@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NYK.Identity" Version="3.0.2-DIABLO-39" />
-    <PackageReference Include="NYK.Identity.UI" Version="3.0.2-DIABLO-39" />
+    <PackageReference Include="NYK.Identity" Version="3.0.3-DIABLO-39" />
+    <PackageReference Include="NYK.Identity.UI" Version="3.0.3-DIABLO-39" />
   </ItemGroup>
 
 </Project>
