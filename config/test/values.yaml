@@ -1,0 +1,10 @@
+#TEST
+containerPort: 80
+startupProbe:
+  enabled: false
+readinessProbe:
+  enabled: false
+livenessProbe:
+  enabled: false
+ingressAuth:
+  enabled: false

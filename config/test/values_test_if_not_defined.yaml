@@ -1,0 +1,34 @@
+# Doc: https://wiki.tools.nykredit.it/display/IPAS/Application+configuration#pod_configuration
+
+containerPort: 80
+
+fullName: dockerazurekubernetespocrolling
+
+# Simple ping-based readiness check
+startupProbe:
+  path: /ready
+  periodSeconds: 5
+  failureThreshold: 120
+
+# Optionally a different readiness endpoint that may check some internal state before declaring the pod ready to accept calls
+readinessProbe:
+  path: /ready
+  initialDelaySeconds: 5
+  timeoutSeconds: 1
+  periodSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+
+# Ongoing health check
+livenessProbe:
+  path: /health
+  initialDelaySeconds: 0
+  timeoutSeconds: 1
+  periodSeconds: 30
+  successThreshold: 1
+  failureThreshold: 5
+
+# Doc: https://wiki.tools.nykredit.it/display/IPAS/JWT+validation+in+ingress
+ingressAuth:
+  enabled: false
+

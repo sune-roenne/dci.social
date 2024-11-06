@@ -14,6 +14,7 @@ public static class DependencyInjectionUI
     {
         builder.Configuration.AddJsonFile("appsettings.json", optional: false);
         builder.Configuration.AddJsonFile("appsettings.local.json", optional: true);
+        builder.Configuration.AddEnvironmentVariables();
         return builder;
     }
 

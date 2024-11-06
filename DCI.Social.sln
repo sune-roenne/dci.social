@@ -3,9 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.UI", "DCI.Social.UI\DCI.Social.UI.csproj", "{C7E23F5A-A805-4544-9FFC-3FEE3151C497}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DCI.Social.UI", "DCI.Social.UI\DCI.Social.UI.csproj", "{C7E23F5A-A805-4544-9FFC-3FEE3151C497}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.Identity", "DCI.Social.Identity\DCI.Social.Identity.csproj", "{0388C19A-B45A-4770-A16E-542D7A6BEA2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DCI.Social.Identity", "DCI.Social.Identity\DCI.Social.Identity.csproj", "{0388C19A-B45A-4770-A16E-542D7A6BEA2A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{0B590E6B-F1DB-4F10-A9D4-6985A6CB531B}"
+	ProjectSection(SolutionItems) = preProject
+		config\test\values.yaml = config\test\values.yaml
+		config\medio\values.yaml = config\medio\values.yaml
+		config\production\values.yaml = config\production\values.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,9 @@
+#MEDIO
+containerPort: 80
+readinessProbe:
+  enabled: false
+livenessProbe:
+  enabled: false
+ingressAuth:
+  enabled: false
+
