@@ -1,0 +1,26 @@
+version: 2
+plan:
+  project-key: SI
+  name: DCI.Social
+  key: DCISOC
+
+variables:
+  Version: '1.0.${bamboo.buildNumber}'
+
+stages:
+  - BuildTestPublish:
+    - Build
+
+Build:
+  key: DCISOCBUILD
+  tasks:
+  - clean
+  - script: pwsh -ExecutionPolicy ByPass -file Build\\BuildDockerImage.ps1 -sourceDir ".\\" -dockerfilePath "DCI.Social.UI/Dockerfile"
+  
+  requirements:
+  - system.git.executable
+  - system.docker.executable
+  - system.builder.command.pwsh
+  - system.builder.command.OctopusCli
+  - system.builder.command.SonarScanner
+  - os_type: linux

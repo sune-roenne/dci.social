@@ -1,10 +1,11 @@
+#PROD
 containerPort: 80
-
+service:
+  port: 8080
 readinessProbe:
   enabled: false
 livenessProbe:
   enabled: false
-
 ingressAuth:
   enabled: false
 

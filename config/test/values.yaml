@@ -1,5 +1,7 @@
 #TEST
 containerPort: 80
+service:
+  port: 8080
 startupProbe:
   enabled: false
 readinessProbe:

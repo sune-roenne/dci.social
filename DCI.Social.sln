@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DCI.Social.Identity", "DCI.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{0B590E6B-F1DB-4F10-A9D4-6985A6CB531B}"
 	ProjectSection(SolutionItems) = preProject
+		bamboo-specs\bamboo.yaml = bamboo-specs\bamboo.yaml
+		Build\BuildDockerImage.ps1 = Build\BuildDockerImage.ps1
 		config\test\values.yaml = config\test\values.yaml
 		config\medio\values.yaml = config\medio\values.yaml
 		config\production\values.yaml = config\production\values.yaml
