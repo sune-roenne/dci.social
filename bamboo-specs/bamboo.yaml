@@ -15,7 +15,7 @@ Build:
   key: DCISOCBUILD
   tasks:
   - clean
-  - script: pwsh -ExecutionPolicy ByPass -file Build\\BuildDockerImage.ps1 -sourceDir ".\\" -dockerfilePath "DCI.Social.UI/Dockerfile"
+  - script: pwsh -ExecutionPolicy ByPass -file Build\\BuildDockerImage.ps1 -sourceDir ".\\" -dockerfilePath "DCI.Social.UI/Dockerfile" -id dci-social
   
   requirements:
   - system.git.executable
