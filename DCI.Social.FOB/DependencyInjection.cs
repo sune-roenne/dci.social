@@ -1,5 +1,6 @@
 ﻿using DCI.Social.FOB.Central;
 using DCI.Social.FOB.Contest;
+using DCI.Social.Fortification;
 using Microsoft.AspNetCore.Builder;
 
 namespace DCI.Social.FOB;
@@ -18,6 +19,7 @@ public static class DependencyInjection
     public static WebApplicationBuilder AddFOBServices(this WebApplicationBuilder builder)
     {
         builder.AddFrameworkServices();
+        builder.AddSecurityServices();
         builder.Services.AddSingleton<IFOBControlService, FOBControlService>();
         return builder;
     }
@@ -29,6 +31,14 @@ public static class DependencyInjection
         builder.Services.AddSignalR();
     }
 
+    private static WebApplicationBuilder AddSecurityServices(this WebApplicationBuilder builder)
+    {
+        builder.AddFortificationEncryption();
+        builder.Services.AddAuthentication()
+            .AddFOBFortificationHQAuthentication(builder.Configuration);
+
+        return builder;
+    }
 
     public static WebApplication UseFOBRequestPipeline(this WebApplication app)
     {
@@ -37,7 +47,7 @@ public static class DependencyInjection
             app.MapOpenApi();
         }
         app.UseHttpsRedirection();
-        app.UseAuthorization();
+        app.UseAuthentication();
         app.MapControllers();
         app.MapHub<ContestHub>("/client/contest");
 

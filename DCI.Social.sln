@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.Fortification", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.Spelunking", "DCI.Social.Spelunking\DCI.Social.Spelunking.csproj", "{272B22F9-5A83-4B58-88E0-9BC285F83AB3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.HeadQuarters", "DCI.Social.HeadQuarters\DCI.Social.HeadQuarters.csproj", "{2DBC84B8-C78F-4F9F-AF36-32D7838885E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{272B22F9-5A83-4B58-88E0-9BC285F83AB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{272B22F9-5A83-4B58-88E0-9BC285F83AB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{272B22F9-5A83-4B58-88E0-9BC285F83AB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DBC84B8-C78F-4F9F-AF36-32D7838885E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DBC84B8-C78F-4F9F-AF36-32D7838885E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DBC84B8-C78F-4F9F-AF36-32D7838885E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DBC84B8-C78F-4F9F-AF36-32D7838885E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

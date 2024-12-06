@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using DCI.Social.Fortification;
+using DCI.Social.Fortification.Encryption;
 using DCI.Social.Spelunking;
 
 var sample = new SampleForTransport(

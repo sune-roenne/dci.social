@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace DCI.Social.Fortification;
+namespace DCI.Social.Fortification.Encryption;
 public class SocialEncryptedStream : IDisposable
 {
     private readonly Aes _symmetricAlgorithm;
@@ -16,25 +16,21 @@ public class SocialEncryptedStream : IDisposable
     public SocialEncryptedStream(byte[]? key = null)
     {
         _symmetricAlgorithm = Aes.Create();
-        if(key != null)
-        {
+        if (key != null)
             _symmetricAlgorithm.Key = key;
-        }
     }
 
 
     public byte[] Key => _symmetricAlgorithm.Key;
 
-    public (byte[] EncryptedBytes,byte[] IV)  Encrypt(byte[] input)
+    public (byte[] EncryptedBytes, byte[] IV) Encrypt(byte[] input)
     {
         using (var output = new MemoryStream())
         {
             var iv = CreateIV(input.Length);
 
             using (var cryptoStream = new CryptoStream(output, _symmetricAlgorithm.CreateEncryptor(_symmetricAlgorithm.Key, iv), CryptoStreamMode.Write))
-            {
                 cryptoStream.Write(input, 0, input.Length);
-            }
             var returnee = output.ToArray();
             return (returnee, iv);
 
@@ -43,13 +39,13 @@ public class SocialEncryptedStream : IDisposable
 
     public string EncryptForTransport(string input)
     {
-        var inputBytes = UTF8Encoding.UTF8.GetBytes(input);
+        var inputBytes = Encoding.UTF8.GetBytes(input);
         var (encBytes, iv) = Encrypt(inputBytes);
         var base64encBytes = Convert.ToBase64String(encBytes);
         var base64iv = Convert.ToBase64String(iv);
         var ivLength = base64iv.Length;
         var ivLengthString = ivLength.ToString();
-        for (int i = 0; ivLengthString.Length < IvLengthPrefixLength; i++)
+        for (var i = 0; ivLengthString.Length < IvLengthPrefixLength; i++)
             ivLengthString = "0" + ivLengthString;
 
         var returnee = $"{ivLengthString}{base64iv}{base64encBytes}";
@@ -70,7 +66,7 @@ public class SocialEncryptedStream : IDisposable
         using var cryptoStream = new CryptoStream(output, _symmetricAlgorithm.CreateDecryptor(_symmetricAlgorithm.Key, iv), CryptoStreamMode.Read);
         using var reader = new StreamReader(cryptoStream);
         var readString = reader.ReadToEnd();
-        var returnee = UTF8Encoding.UTF8.GetBytes(readString);
+        var returnee = Encoding.UTF8.GetBytes(readString);
         return returnee;
     }
 
@@ -101,7 +97,7 @@ public class SocialEncryptedStream : IDisposable
 
     private byte[] CreateIV(int length)
     {
-        length = length - (length % 16);
+        length = length - length % 16;
         length = length + 16;
         var returnee = new byte[16];
         _random.GetBytes(returnee);

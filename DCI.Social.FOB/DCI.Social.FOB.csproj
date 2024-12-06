@@ -14,11 +14,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DCI.Social.Fortification\DCI.Social.Fortification.csproj" />
     <ProjectReference Include="..\DCI.Social.Messages\DCI.Social.Messages.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <None Update="hq.crt" Condition="Exists('hq.crt')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   
