@@ -1,4 +1,4 @@
-﻿using DCI.Social.FOB.Controllers;
+﻿using DCI.Social.FOB.Central;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DCI.Social.FOB.Common;

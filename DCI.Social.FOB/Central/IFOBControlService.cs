@@ -1,7 +1,7 @@
 ﻿using DCI.Social.FOB.Common;
 using DCI.Social.FOB.User;
 
-namespace DCI.Social.FOB.Controllers;
+namespace DCI.Social.FOB.Central;
 
 public interface IFOBControlService
 {

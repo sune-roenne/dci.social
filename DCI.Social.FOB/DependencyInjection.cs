@@ -1,5 +1,5 @@
-﻿using DCI.Social.FOB.Contest;
-using DCI.Social.FOB.Controllers;
+﻿using DCI.Social.FOB.Central;
+using DCI.Social.FOB.Contest;
 using Microsoft.AspNetCore.Builder;
 
 namespace DCI.Social.FOB;

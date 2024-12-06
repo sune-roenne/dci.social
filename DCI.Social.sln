@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.Application", "D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.Domain", "DCI.Social.Domain\DCI.Social.Domain.csproj", "{9625360D-1F60-45DA-8C5F-EE44092D07BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.Fortification", "DCI.Social.Fortification\DCI.Social.Fortification.csproj", "{97BE2F0E-C3A6-43DC-8E47-D67BA3EF392B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.Spelunking", "DCI.Social.Spelunking\DCI.Social.Spelunking.csproj", "{272B22F9-5A83-4B58-88E0-9BC285F83AB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{9625360D-1F60-45DA-8C5F-EE44092D07BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9625360D-1F60-45DA-8C5F-EE44092D07BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9625360D-1F60-45DA-8C5F-EE44092D07BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97BE2F0E-C3A6-43DC-8E47-D67BA3EF392B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97BE2F0E-C3A6-43DC-8E47-D67BA3EF392B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97BE2F0E-C3A6-43DC-8E47-D67BA3EF392B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97BE2F0E-C3A6-43DC-8E47-D67BA3EF392B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{272B22F9-5A83-4B58-88E0-9BC285F83AB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{272B22F9-5A83-4B58-88E0-9BC285F83AB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{272B22F9-5A83-4B58-88E0-9BC285F83AB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{272B22F9-5A83-4B58-88E0-9BC285F83AB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
