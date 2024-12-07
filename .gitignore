@@ -13,3 +13,4 @@
 /DCI.Social.UI/resources/certificate/dci.social.crt
 /DCI.Social.UI/resources/certificate/dci.social.key
 /DCI.Social.UI/resources/certificate/dci.social.pfx
+**/*.secrets.yaml

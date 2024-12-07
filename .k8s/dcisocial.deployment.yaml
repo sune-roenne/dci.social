@@ -14,9 +14,23 @@ spec:
       labels:
         app: dcisocial
     spec:
+      volumes:
+        - name: crt-volume
+          secret:
+            secretName: dcisocial-certs-own          
       containers:
       - name: dcisocial
         image: docker.io/suneroenne/dcisocial:1.0.1
         ports:
         - containerPort: 8080
           name: http-dcisocial
+        env:
+        - name: AzureAd__ClientSecret
+          valueFrom:
+            secretKeyRef:
+              name: dcisocial-secrets
+              key: azureclientsecret
+        volumeMounts:
+                - name: crt-volume
+                  readOnly: true
+                  mountPath: "/crt-volume"              
