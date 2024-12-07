@@ -1,9 +1,6 @@
 ﻿using DCI.Social.Identity;
-using DCI.Social.UI.Components;
 using DCI.Social.UI.Server;
-using NYK.Identity;
-using NYK.Identity.Configuration;
-using NYK.Identity.UI;
+using Microsoft.Identity.Web;
 
 namespace DCI.Social.UI;
 
@@ -21,16 +18,21 @@ public static class DependencyInjectionUI
 
     public static WebApplicationBuilder AddServices(this WebApplicationBuilder builder)
     {
+
         builder.AddIdentity();
+        builder.Services.AddRazorComponents()
+            .AddInteractiveServerComponents()
+            .AddMicrosoftIdentityConsentHandler();
+        builder.Services.AddControllers();
+        builder.Services.AddHttpContextAccessor();
         return builder;
     }
 
     public static WebApplication UseMiddlewarePipeline(this WebApplication app)
     {
-        var conf = app.Services.GetRequiredService<NykreditIdentityConfiguration>();
-        app.UseNykreditOpenApiUIWithSecurity<App>();
+        app.UseStaticFiles();
+        app.UseIdentityPipeline<App>();
         return app;
-
     }
 
 }

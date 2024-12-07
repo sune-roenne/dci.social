@@ -1,0 +1,17 @@
+﻿.dci-social-home-page {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/home/logo.webp');
+    background-size: contain;
+    background-repeat: no-repeat;
+    
+}
+
+
+.dci-social-home-user-name {
+    font-family: Papyrus;
+    font-size: 72pt;
+}

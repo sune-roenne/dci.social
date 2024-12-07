@@ -1,5 +1,6 @@
 ﻿using DCI.Social.FOB.Central;
 using DCI.Social.FOB.Contest;
+using DCI.Social.FOB.HeadQuarters;
 using DCI.Social.Fortification;
 using Microsoft.AspNetCore.Builder;
 
@@ -28,7 +29,10 @@ public static class DependencyInjection
     {
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
-        builder.Services.AddSignalR();
+        builder.Services.AddSignalR(opts =>
+        {
+
+        });
     }
 
     private static WebApplicationBuilder AddSecurityServices(this WebApplicationBuilder builder)
@@ -49,7 +53,13 @@ public static class DependencyInjection
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.MapControllers();
-        app.MapHub<ContestHub>("/client/contest");
+        app.MapHub<ContestHub>("/client/contest", opts =>
+        {
+            
+        });
+        app.MapHub<HeadQuartersHub>("/hq", opts =>
+        {
+        });
 
         return app;
     }

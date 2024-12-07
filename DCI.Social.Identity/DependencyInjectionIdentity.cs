@@ -1,20 +1,40 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using NYK.Identity.Configuration;
-using NYK.Identity.UI;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Web;
 
 namespace DCI.Social.Identity;
 public static class DependencyInjectionIdentity
 {
 
+
+
+
     public static WebApplicationBuilder AddIdentity(this WebApplicationBuilder builder)
     {
-        var identConfig = NykreditIdentityConfigurationBuilder.From()
-            .WithCustomAuthorizationPolicy(IdentityConstants.IsAuthenticatedPolicyName, IsAuthenticatedPolicy)
-            .Build();
-
-        builder.AddDefaultNykreditIdentitySetupForUiApp(identityConfigurationOverrides: identConfig);
+        builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+            .AddMicrosoftIdentityWebApp(builder.Configuration);
+        builder.Services.AddAuthorization(opts =>
+        {
+            opts.AddPolicy(IdentityConstants.IsAuthenticatedPolicyName , IsAuthenticatedPolicy);
+        });
         return builder;
+            
+    }
+
+
+    public static WebApplication UseIdentityPipeline<TApp>(this WebApplication app) where TApp : class
+    {
+        app.UseRouting();
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.UseAntiforgery();
+        app.MapRazorComponents<TApp>()
+            .AddInteractiveServerRenderMode();
+        app.MapControllers();
+        return app;
     }
 
 

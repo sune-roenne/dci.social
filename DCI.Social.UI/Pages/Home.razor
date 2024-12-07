@@ -1,10 +1,11 @@
 ﻿@page "/"
 @using DCI.Social.Identity
-@using NYK.Identity.Authorization
-@attribute [NykreditAuthorization(AuthorizationPolicyName = IdentityConstants.IsAuthenticatedPolicyName)]
+@attribute [Authorize(Policy = IdentityConstants.IsAuthenticatedPolicyName)]
 
-<PageTitle>Home</PageTitle>
+<PageTitle>DCI Social</PageTitle>
+<div class="dci-social-home-page">
+    @if(_userName != null) {
+        <div class="dci-social-home-user-name">@_userName</div>
+    }
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+</div>
