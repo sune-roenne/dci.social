@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fob
+  labels:
+    app: fob
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fob
+  template:
+    metadata:
+      labels:
+        app: fob
+    spec:
+      containers:
+      - name: fob
+        image: docker.io/suneroenne/fob:1.0.1
+        ports:
+        - containerPort: 8080
+          name: http-fob

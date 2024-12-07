@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dcisocial
+  labels:
+    app: dcisocial
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dcisocial
+  template:
+    metadata:
+      labels:
+        app: dcisocial
+    spec:
+      containers:
+      - name: dcisocial
+        image: docker.io/suneroenne/dcisocial:1.0.1
+        ports:
+        - containerPort: 8080
+          name: http-dcisocial

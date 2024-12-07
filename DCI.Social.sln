@@ -23,6 +23,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.Spelunking", "DC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Social.HeadQuarters", "DCI.Social.HeadQuarters\DCI.Social.HeadQuarters.csproj", "{2DBC84B8-C78F-4F9F-AF36-32D7838885E4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".k8s", ".k8s", "{4EC4DED3-D083-4068-9791-2FBEFD996611}"
+	ProjectSection(SolutionItems) = preProject
+		.k8s\dcisocial.deployment.yaml = .k8s\dcisocial.deployment.yaml
+		.k8s\dcisocial.service.yaml = .k8s\dcisocial.service.yaml
+		.k8s\fob.deployment.yaml = .k8s\fob.deployment.yaml
+		.k8s\fob.service.yaml = .k8s\fob.service.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
