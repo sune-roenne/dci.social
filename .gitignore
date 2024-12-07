@@ -10,3 +10,6 @@
 /DCI.Social.FOB/hq.crt
 /DCI.Social.HeadQuarters/resources/hq.pfx
 /DCI.Social.HeadQuarters/resources/hq.crt
+/DCI.Social.UI/resources/certificate/dci.social.crt
+/DCI.Social.UI/resources/certificate/dci.social.key
+/DCI.Social.UI/resources/certificate/dci.social.pfx
