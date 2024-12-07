@@ -30,6 +30,13 @@ spec:
             secretKeyRef:
               name: dcisocial-secrets
               key: azureclientsecret
+        - name: Identity__OwnCrtFile
+          value: /crt-volume/tls.crt
+        - name: AzureAd__CallbackPath
+          value: /dci/oauth2-signin
+
+        - name: Identity__OwnKeyFile
+          value: /crt-volume/tls.key
         volumeMounts:
                 - name: crt-volume
                   readOnly: true

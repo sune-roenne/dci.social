@@ -1,0 +1,2 @@
+openssl req -x509 -nodes -days 730 -newkey rsa:2048 -keyout dci.social.key -out dci.social.crt -config openssl.conf -extensions v3_req
+openssl pkcs12 -export -out dci.social.pfx -inkey dci.social.key -in dci.social.crt -password pass:$PSWD

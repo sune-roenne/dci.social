@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace DCI.Social.Identity.Configuration;
 public class IdentityConfiguration { 
-    
+    public const string ConfigurationElementName = "Identity";
+    public string OwnCrtFile { get; set; }
+    public string OwnKeyFile {get; set; }
 
 
 

@@ -14,3 +14,4 @@
 /DCI.Social.UI/resources/certificate/dci.social.key
 /DCI.Social.UI/resources/certificate/dci.social.pfx
 **/*.secrets.yaml
+build-and-publish.sh
