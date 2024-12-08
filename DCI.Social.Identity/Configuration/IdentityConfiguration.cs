@@ -10,6 +10,8 @@ public class IdentityConfiguration {
     public string OwnCrtFile { get; set; }
     public string OwnKeyFile {get; set; }
 
+    public bool ChangeSchemeToHttps {get; set;}
+
 
 
 }

@@ -20,7 +20,7 @@ spec:
             secretName: dcisocial-certs-own          
       containers:
       - name: dcisocial
-        image: docker.io/suneroenne/dcisocial:1.0.1
+        image: docker.io/suneroenne/dcisocial:1.0.5
         ports:
         - containerPort: 8080
           name: http-dcisocial
@@ -32,10 +32,14 @@ spec:
               key: azureclientsecret
         - name: Identity__OwnCrtFile
           value: /crt-volume/tls.crt
-        - name: AzureAd__CallbackPath
-          value: /dci/oauth2-signin
+        - name: Identity__ChangeSchemeToHttps
+          value: "true"
         - name: Identity__OwnKeyFile
           value: /crt-volume/tls.key
+        - name: AzureAd__CallbackPath
+          value: /dci/oauth2-signin
+        - name: Logging__LogLevel__DCI.Social.Identity.Middleware.UrlRedirectRewriteMiddleWare
+          value: Debug
         - name: UI_HostingBasePath
           value: dci
 
