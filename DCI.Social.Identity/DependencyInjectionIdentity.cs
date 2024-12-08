@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using DCI.Social.Identity.Configuration;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -20,8 +20,8 @@ public static class DependencyInjectionIdentity
         {
             opts.AddPolicy(IdentityConstants.IsAuthenticatedPolicyName , IsAuthenticatedPolicy);
         });
+        builder.Services.Configure<IdentityConfiguration>(builder.Configuration.GetSection(IdentityConfiguration.ConfigurationElementName));
         return builder;
-            
     }
 
 
