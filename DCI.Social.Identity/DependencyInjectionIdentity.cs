@@ -25,7 +25,7 @@ public static class DependencyInjectionIdentity
     }
 
 
-    public static WebApplication UseIdentityPipeline<TApp>(this WebApplication app) where TApp : class
+    public static WebApplication UseIdentityPipeline<TApp>(this WebApplication app, string? hostingBasePath) where TApp : class
     {
         app.UseRouting();
         app.UseAuthentication();
@@ -34,6 +34,8 @@ public static class DependencyInjectionIdentity
         app.MapRazorComponents<TApp>()
             .AddInteractiveServerRenderMode();
         app.MapControllers();
+        if(hostingBasePath != null)
+            app.MapBlazorHub("/" +  hostingBasePath);
         return app;
     }
 

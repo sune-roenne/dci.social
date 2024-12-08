@@ -34,9 +34,11 @@ spec:
           value: /crt-volume/tls.crt
         - name: AzureAd__CallbackPath
           value: /dci/oauth2-signin
-
         - name: Identity__OwnKeyFile
           value: /crt-volume/tls.key
+        - name: UI_HostingBasePath
+          value: dci
+
         volumeMounts:
                 - name: crt-volume
                   readOnly: true

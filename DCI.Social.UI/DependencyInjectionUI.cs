@@ -1,4 +1,5 @@
 ﻿using DCI.Social.Identity;
+using DCI.Social.UI.Configuration;
 using DCI.Social.UI.Server;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web;
@@ -13,6 +14,7 @@ public static class DependencyInjectionUI
         builder.Configuration.AddJsonFile("appsettings.json", optional: false);
         builder.Configuration.AddJsonFile("appsettings.local.json", optional: true);
         builder.Configuration.AddEnvironmentVariables();
+        builder.Services.Configure<UIConfiguration>(builder.Configuration.GetSection(UIConfiguration.ConfigurationElementName));
         return builder;
     }
 
@@ -37,10 +39,18 @@ public static class DependencyInjectionUI
 
     public static WebApplication UseMiddlewarePipeline(this WebApplication app)
     {
+        var conf = app.Configuration.UIConfig();
         app.UseForwardedHeaders();
         app.UseStaticFiles();
-        app.UseIdentityPipeline<App>();
+        app.UseIdentityPipeline<App>(conf.HostingBasePath);
         return app;
+    }
+
+    private static UIConfiguration UIConfig(this IConfiguration conf)
+    {
+        var returnee = new UIConfiguration();
+        conf.Bind(UIConfiguration.ConfigurationElementName, returnee);
+        return returnee;
     }
 
 }
