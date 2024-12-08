@@ -12,6 +12,6 @@ public class IdentityConfiguration {
 
     public bool ChangeSchemeToHttps {get; set;}
 
-
-
 }
+
+
