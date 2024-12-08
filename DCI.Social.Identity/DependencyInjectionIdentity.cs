@@ -34,7 +34,7 @@ public static class DependencyInjectionIdentity
         app.MapRazorComponents<TApp>()
             .AddInteractiveServerRenderMode();
         app.MapControllers();
-        if(hostingBasePath != null)
+        if(!string.IsNullOrWhiteSpace(hostingBasePath))
             app.MapBlazorHub("/" +  hostingBasePath);
         return app;
     }

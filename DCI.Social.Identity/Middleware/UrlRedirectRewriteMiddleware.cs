@@ -1,3 +1,4 @@
+using DCI.Social.Domain.Util;
 using DCI.Social.Identity.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -24,10 +25,11 @@ public class UrlRedirectRewriteMiddleWare {
     public async Task InvokeAsync(HttpContext context)
     {
         _logger.LogDebug($"Request headers: ");
-        foreach(var headerValue in context.Request.Headers) 
-        {
-            _logger.LogDebug($"  {headerValue.Key}: {headerValue.Value}");
-        }
+        var headersString = context.Request.Headers
+            .Select(_ => (_.Key, (string?) _.Value.ToString()))
+            .AsLoggableString();
+        _logger.LogInformation(headersString);
+
         //if(_rewriteToHttps)
            // context.Request.Scheme = "https";
 

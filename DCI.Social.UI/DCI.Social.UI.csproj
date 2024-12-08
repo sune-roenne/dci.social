@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DCI.Social.Application\DCI.Social.Application.csproj" />
     <ProjectReference Include="..\DCI.Social.Identity\DCI.Social.Identity.csproj" />
   </ItemGroup>
 

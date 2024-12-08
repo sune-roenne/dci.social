@@ -16,4 +16,9 @@
   </ItemGroup>
 
 
+  <ItemGroup>
+    <ProjectReference Include="..\DCI.Social.Application\DCI.Social.Application.csproj" />
+  </ItemGroup>
+
+
 </Project>
