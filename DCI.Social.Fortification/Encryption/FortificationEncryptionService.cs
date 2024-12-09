@@ -1,4 +1,6 @@
 ﻿using DCI.Social.Fortification.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -14,33 +16,37 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
     private SocialEncryptedStream _stream = new SocialEncryptedStream();
     private readonly RSA _trustedRsaPublicKey;
     private static readonly RSAEncryptionPadding Padding = RSAEncryptionPadding.Pkcs1;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public FortificationEncryptionService(IOptions<FortificationConfiguration> options)
+    public FortificationEncryptionService(IOptions<FortificationConfiguration> options, IServiceScopeFactory scopeFactory)
     {
         _trustedRsaPublicKey = RSA.Create();
         var publicKeyString = File.ReadAllText(options.Value.TrustedCertificateFile);
         _trustedRsaPublicKey.ImportFromPem(publicKeyString);
+        _scopeFactory = scopeFactory;
     }
 
     public async Task<T> DecryptFromTransport<T>(string input) where T : class =>
-        await Locked(() => _stream.DeserializeFromTransport<T>(input));
+        await Locked(() => _stream.DeserializeFromTransport<T>(input), nameof(DecryptFromTransport));
 
 
     public async Task<string> DecryptStringFromTransport(string input) => 
-        await Locked(() => _stream.DecryptFromTransport(input));
+        await Locked(() => _stream.DecryptFromTransport(input), nameof(DecryptStringFromTransport));
 
     public async Task<string> EncryptForTransport<T>(T input) where T : class =>
-        await Locked(() => _stream.EncryptForTransport(input));
+        await Locked(() => _stream.EncryptForTransport(input), nameof(EncryptForTransport));
 
     public async Task<string> EncryptStringForTransport(string input) => 
-        await Locked(() => _stream.EncryptForTransport(input));
+        await Locked(() => _stream.EncryptForTransport(input), nameof(EncryptStringForTransport));
 
     public async Task UpdateWithKey(byte[] key) =>
         await LockedAction(() => _stream = new SocialEncryptedStream(key));
 
 
-    private async Task<T> LockedAsync<T>(Func<Task<T>> toPerform)
+    private async Task<T> LockedAsync<T>(Func<Task<T>> toPerform, string? logString)
     {
+        if (logString != null)
+            Log(logString);
         await _lock.WaitAsync();
         try
         {
@@ -53,8 +59,8 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
         }
     }
 
-    private Task<T> Locked<T>(Func<T> toPerform) => 
-        LockedAsync(() => Task.FromResult(toPerform()));
+    private Task<T> Locked<T>(Func<T> toPerform, string? logString) => 
+        LockedAsync(() => Task.FromResult(toPerform()), logString);
 
 
 
@@ -64,7 +70,7 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
             await Task.CompletedTask;
             toPerform();
             return 0;
-        });
+        }, logString: null);
 
     public Task<string> EncryptSymmetricKey()
     {
@@ -79,6 +85,14 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
         var decrypted = _trustedRsaPublicKey.Decrypt(asBytes, Padding);
         await UpdateWithKey(decrypted);
     }
+
+    private void Log(string message)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<FortificationEncryptionService>>();
+        logger.LogInformation(message);
+    }
+
 }
 
 

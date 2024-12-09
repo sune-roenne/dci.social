@@ -50,14 +50,13 @@ public static class DependencyInjection
         {
             app.MapOpenApi();
         }
-        app.UseHttpsRedirection();
         app.UseAuthentication();
         app.MapControllers();
         app.MapHub<ContestHub>("/client/contest", opts =>
         {
             
         });
-        app.MapHub<HeadQuartersHub>("/hq", opts =>
+        app.MapHub<HeadQuartersHub>("/hqhub", opts =>
         {
         });
 
