@@ -14,6 +14,7 @@ public static class DependencyInjection
         builder.Configuration.AddJsonFile("appsettings.json");
         builder.Configuration.AddJsonFile("appsettings.local.json", optional: true);
         builder.Configuration.AddEnvironmentVariables();
+        builder.AddFortificationConfiguration();
         return builder;
     }
 

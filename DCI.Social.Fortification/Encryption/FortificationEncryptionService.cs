@@ -1,4 +1,5 @@
 ﻿using DCI.Social.Fortification.Configuration;
+using DCI.Social.Fortification.Util;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,10 +22,14 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
 
     public FortificationEncryptionService(IOptions<FortificationConfiguration> options, IServiceScopeFactory scopeFactory)
     {
-        _trustedRsaPublicKey = RSA.Create();
-        var publicKeyString = File.ReadAllText(options.Value.TrustedCertificateFile);
-        _trustedRsaPublicKey.ImportFromPem(publicKeyString);
         _scopeFactory = scopeFactory;
+        _trustedRsaPublicKey = RSA.Create();
+        var publicKeyString = options.Value.TrustedCertificateFile.ReadCertificateFile();
+        Log($"Using HQ certificate file: {options.Value.TrustedCertificateFile}");
+        Log(publicKeyString);
+        var certBytes = Convert.FromBase64String(publicKeyString);
+        var cert = X509CertificateLoader.LoadCertificate(certBytes);
+        _trustedRsaPublicKey = cert.GetRSAPublicKey()!;
     }
 
     public async Task<T> DecryptFromTransport<T>(string input) where T : class =>
