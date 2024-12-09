@@ -21,6 +21,8 @@ public static class DependencyInjectionIdentity
             opts.AddPolicy(IdentityConstants.IsAuthenticatedPolicyName , IsAuthenticatedPolicy);
         });
         builder.Services.Configure<IdentityConfiguration>(builder.Configuration.GetSection(IdentityConfiguration.ConfigurationElementName));
+        builder.Services.Configure<AzureAdConfiguration>(builder.Configuration.GetSection(AzureAdConfiguration.ConfigurationElementName));
+
         return builder;
     }
 
@@ -33,9 +35,9 @@ public static class DependencyInjectionIdentity
         app.UseAntiforgery();
         app.MapRazorComponents<TApp>()
             .AddInteractiveServerRenderMode();
-        app.MapControllers();
         if(!string.IsNullOrWhiteSpace(hostingBasePath))
             app.MapBlazorHub("/" +  hostingBasePath);
+        app.MapControllers();
         return app;
     }
 

@@ -20,7 +20,7 @@ spec:
             secretName: dcisocial-certs-own          
       containers:
       - name: dcisocial
-        image: docker.io/suneroenne/dcisocial:1.0.5
+        image: docker.io/suneroenne/dcisocial:1.0.14
         ports:
         - containerPort: 8080
           name: http-dcisocial
@@ -40,7 +40,7 @@ spec:
           value: /dci/oauth2-signin
         - name: Logging__LogLevel__DCI.Social.Identity.Middleware.UrlRedirectRewriteMiddleWare
           value: Debug
-        - name: UI_HostingBasePath
+        - name: UI__HostingBasePath
           value: dci
 
         volumeMounts:

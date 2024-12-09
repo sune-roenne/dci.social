@@ -1,5 +1,5 @@
 ﻿using DCI.Social.Identity;
-using DCI.Social.Identity.Middleware;
+using DCI.Social.UI.Middleware;
 using DCI.Social.UI.Configuration;
 using DCI.Social.UI.Server;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -41,8 +41,8 @@ public static class DependencyInjectionUI
     public static WebApplication UseMiddlewarePipeline(this WebApplication app)
     {
         var conf = app.Configuration.UIConfig();
-        app.UseForwardedHeaders();
         app.UseMiddleware<UrlRedirectRewriteMiddleWare>();
+        app.UseForwardedHeaders();
         app.UseStaticFiles();
         app.UseIdentityPipeline<App>(conf.HostingBasePath);
         return app;
