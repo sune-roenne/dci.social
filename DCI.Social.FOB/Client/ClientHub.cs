@@ -4,14 +4,14 @@ using DCI.Social.Messages.Contest;
 using DCI.Social.Messages.Contest.Round;
 using Microsoft.AspNetCore.SignalR;
 
-namespace DCI.Social.FOB.Contest;
+namespace DCI.Social.FOB.Client;
 
-public class ContestHub : FOBHub
+public class ClientHub : FOBHub
 {
 
-    private readonly ILogger<ContestHub> _logger;
+    private readonly ILogger<ClientHub> _logger;
 
-    public ContestHub(ILogger<ContestHub> logger, IServiceScopeFactory scopeFactory) : base(scopeFactory)
+    public ClientHub(ILogger<ClientHub> logger, IServiceScopeFactory scopeFactory) : base(scopeFactory)
     {
         _logger = logger;
     }
@@ -32,14 +32,14 @@ public class ContestHub : FOBHub
     public async Task SubmitRoundAnswer(RoundSubmitOptionMessage message)
     {
         var user = Context.User?.ExtractUser();
-        if(user!= null)
+        if (user != null)
         {
-            var acceptance = await WithController(cont => cont.SubmitRoundOption(user, message.RoundId, message.OptionId));
-            if(acceptance != null)
+            var acceptance = await WithControllerService(cont => cont.SubmitRoundOption(user, message.RoundId, message.OptionId));
+            if (acceptance != null)
             {
                 var retMes = new RoundConfirmSubmitOptionMessage(
-                    message.RoundId, OptionId: message.OptionId, 
-                    AcceptedOnMessageId: acceptance.MessageId, 
+                    message.RoundId, OptionId: message.OptionId,
+                    AcceptedOnMessageId: acceptance.MessageId,
                     AcceptanceTime: acceptance.CommittedTime);
                 await Clients.Caller.SendAsync(RoundConstants.ClientMethodNames.ConfirmOptionSubmitted);
             }

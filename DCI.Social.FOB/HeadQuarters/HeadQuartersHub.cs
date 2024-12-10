@@ -1,5 +1,6 @@
 ﻿using DCI.Social.FOB.Common;
 using DCI.Social.Fortification.Authentication;
+using DCI.Social.Messages.Contest.Buzzer;
 using Microsoft.AspNetCore.Authorization;
 
 namespace DCI.Social.FOB.HeadQuarters;
@@ -11,6 +12,16 @@ public class HeadQuartersHub : FOBHub
     {
     }
 
+    public async Task BuzzerStartRound(BuzzerStartRoundMessage mess)
+    {
+
+    }
+
+
+    public async Task BuzzerAckBuzz(BuzzerAckBuzzMessage mess)
+    {
+
+    }
 
 
 

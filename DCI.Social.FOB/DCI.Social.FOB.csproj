@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DCI.Social.Domain\DCI.Social.Domain.csproj" />
     <ProjectReference Include="..\DCI.Social.Fortification\DCI.Social.Fortification.csproj" />
     <ProjectReference Include="..\DCI.Social.Messages\DCI.Social.Messages.csproj" />
   </ItemGroup>

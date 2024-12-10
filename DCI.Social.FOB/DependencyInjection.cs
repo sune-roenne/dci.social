@@ -1,5 +1,5 @@
 ﻿using DCI.Social.FOB.Central;
-using DCI.Social.FOB.Contest;
+using DCI.Social.FOB.Client;
 using DCI.Social.FOB.HeadQuarters;
 using DCI.Social.Fortification;
 using DCI.Social.Messages.Locations;
@@ -54,7 +54,7 @@ public static class DependencyInjection
         }
         app.UseAuthentication();
         app.MapControllers();
-        app.MapHub<ContestHub>("/client/contest", opts =>
+        app.MapHub<ClientHub>("/client/contest", opts =>
         {
             
         });

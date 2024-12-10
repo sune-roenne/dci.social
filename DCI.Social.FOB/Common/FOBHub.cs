@@ -12,7 +12,7 @@ public class FOBHub : Hub
         _scopeFactory = scopeFactory;
     }
 
-    protected async Task<T> WithController<T>(Func<IFOBControlService, Task<T>> toPerform)
+    protected async Task<T> WithControllerService<T>(Func<IFOBControlService, Task<T>> toPerform)
     {
         using var scope = _scopeFactory.CreateScope();
         var controller = scope.ServiceProvider.GetRequiredService<IFOBControlService>();
@@ -21,10 +21,10 @@ public class FOBHub : Hub
     }
 
     protected async Task WithControllerAction(Func<IFOBControlService, Task> toPerform) =>
-        _ = await WithController(async controller =>
+        _ = await WithControllerService(async controller =>
         {
             await toPerform(controller);
-            return 1;
+            return 0;
         });
 
 
