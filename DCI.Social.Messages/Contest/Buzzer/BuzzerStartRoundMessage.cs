@@ -8,4 +8,9 @@ using System.Threading.Tasks;
 namespace DCI.Social.Messages.Contest.Buzzer;
 public record BuzzerStartRoundMessage(
     string? Message
-    ) : AbstractMessage;
+    ) : AbstractMessage
+{
+    public const string MethodName = "BuzzerStartRound";
+
+
+}

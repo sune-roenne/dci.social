@@ -8,4 +8,9 @@ using System.Threading.Tasks;
 namespace DCI.Social.Messages.Contest.Buzzer;
 public record BuzzerAckBuzzMessage(
     string User
-    ) : AbstractMessage;
+    ) : AbstractMessage
+{
+    public const string MethodName = "BuzzerAckBuzz";
+
+}
+

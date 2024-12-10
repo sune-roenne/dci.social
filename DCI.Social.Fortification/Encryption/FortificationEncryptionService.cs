@@ -24,6 +24,8 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
     private bool _receivedSymmetricKey = false;
     public bool IsInitiatedWithSymmetricKey => _receivedSymmetricKey;
 
+    public string CurrentSymmetricKey => Convert.ToBase64String(_stream.Key);
+
     public FortificationEncryptionService(IOptions<FortificationConfiguration> options, IServiceScopeFactory scopeFactory)
     {
         _scopeFactory = scopeFactory;

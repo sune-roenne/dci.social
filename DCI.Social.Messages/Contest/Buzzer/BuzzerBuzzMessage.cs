@@ -7,5 +7,12 @@ using System.Threading.Tasks;
 
 namespace DCI.Social.Messages.Contest.Buzzer;
 public record BuzzerBuzzMessage(
-    string User
-    ) : AbstractMessage;
+    string User,
+    DateTime BuzzTime
+    ) : AbstractMessage
+{
+    public const string MethodName = "BuzzerBuzz";
+
+
+}
+

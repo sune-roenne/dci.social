@@ -2,6 +2,7 @@
 using DCI.Social.FOB.Contest;
 using DCI.Social.FOB.HeadQuarters;
 using DCI.Social.Fortification;
+using DCI.Social.Messages.Locations;
 using Microsoft.AspNetCore.Builder;
 
 namespace DCI.Social.FOB;
@@ -57,7 +58,7 @@ public static class DependencyInjection
         {
             
         });
-        app.MapHub<HeadQuartersHub>("/hqhub", opts =>
+        app.MapHub<HeadQuartersHub>($"/{FOBLocations.HeadQuartersHub}", opts =>
         {
         });
 

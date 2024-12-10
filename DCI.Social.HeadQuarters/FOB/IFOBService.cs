@@ -12,4 +12,6 @@ public interface IFOBService
     Task ForwardBuzz(Buzz buzz);
     event EventHandler<Buzz> OnBuzz;
 
+    void Shutdown();
+
 }
