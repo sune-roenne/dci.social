@@ -10,6 +10,8 @@ public partial class BuzzerPage : IDisposable
     [Inject]
     public IFOBService FOBService { get; set; }
     private bool _hasRegisteredAsListener = false;
+    private bool _buzzerIsPressed = false;
+    private bool _buzzIsAcknowledged = false;
 
 
     protected override void OnParametersSet()
@@ -28,13 +30,15 @@ public partial class BuzzerPage : IDisposable
     }
     private void OnBuzzerRoundStarted(object? sender, string message)
     {
-
+        _buzzerIsPressed = false;
+        _buzzIsAcknowledged = false;
     }
 
 
 
     public void Dispose()
     {
-        throw new NotImplementedException();
+        FOBService.OnBuzzerRoundStart -= OnBuzzerRoundStarted;
+        FOBService.OnBuzzAcknowledged -= OnBuzzerAcknowledged;
     }
 }
