@@ -11,6 +11,8 @@ public class FortificationConfiguration
 
     public string TrustedCertificateFile { get; set; }
     public string? TrustedPrivateKeyFile { get; set; }
+    public string? ClientCertificateFile { get; set; }
+    public string? ClientPrivateKeyFile { get; set; }
 
 
 }

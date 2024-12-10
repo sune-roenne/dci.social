@@ -13,10 +13,17 @@ public static class FortificationAuthenticationConstants
     public const string FOBAuthenticatePath = "/fob-authenticate";
 
     public const string AuthenticationType = "FOBFortification";
+
+    public const string ClientAuthenticationType = "FOBClientFortification";
+
     public static class ClaimsIdentity
     {
         public const string HqNameType = "name";
         public const string HqName = "HeadQuarters";
+
+        public const string ClientNameType = "name";
+        public const string ClientName = "Client";
+
     }
 
 }

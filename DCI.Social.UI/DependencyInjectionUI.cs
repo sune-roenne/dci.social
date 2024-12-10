@@ -4,6 +4,8 @@ using DCI.Social.UI.Configuration;
 using DCI.Social.UI.Server;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web;
+using DCI.Social.Fortification;
+using DCI.Social.UI.FOB;
 
 namespace DCI.Social.UI;
 
@@ -16,6 +18,7 @@ public static class DependencyInjectionUI
         builder.Configuration.AddJsonFile("appsettings.local.json", optional: true);
         builder.Configuration.AddEnvironmentVariables();
         builder.Services.Configure<UIConfiguration>(builder.Configuration.GetSection(UIConfiguration.ConfigurationElementName));
+        builder.AddFortificationConfiguration();
         return builder;
     }
 
@@ -35,6 +38,7 @@ public static class DependencyInjectionUI
             opts.KnownNetworks.Clear();
             opts.KnownProxies.Clear();
         });
+        builder.Services.AddSingleton<IFOBService, FOBService>();
         return builder;
     }
 

@@ -33,6 +33,19 @@ public static class DependencyInjectionFortification
         return builder;
     }
 
+    public static AuthenticationBuilder AddFOBFortificationClientAuthentication(this AuthenticationBuilder builder, IConfiguration applicationConfiguration)
+    {
+        builder
+            .AddScheme<FortificationAuthenticationOptions, ClientFortificationAuthenticationHandler>(FortificationAuthenticationConstants.ClientAuthenticationType, opts =>
+            {
+                var conf = new FortificationConfiguration();
+                applicationConfiguration.Bind(FortificationConfiguration.ConfigurationElementName, conf);
+                opts.FortificationConfiguration = conf;
+            });
+        return builder;
+    }
+
+
 
 
 

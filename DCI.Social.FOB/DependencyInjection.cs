@@ -41,7 +41,8 @@ public static class DependencyInjection
     {
         builder.AddFortificationEncryption();
         builder.Services.AddAuthentication()
-            .AddFOBFortificationHQAuthentication(builder.Configuration);
+            .AddFOBFortificationHQAuthentication(builder.Configuration)
+            .AddFOBFortificationClientAuthentication(builder.Configuration);
 
         return builder;
     }
@@ -54,9 +55,8 @@ public static class DependencyInjection
         }
         app.UseAuthentication();
         app.MapControllers();
-        app.MapHub<ClientHub>("/client/contest", opts =>
+        app.MapHub<ClientHub>($"/{FOBLocations.ClientHub}", opts =>
         {
-            
         });
         app.MapHub<HeadQuartersHub>($"/{FOBLocations.HeadQuartersHub}", opts =>
         {

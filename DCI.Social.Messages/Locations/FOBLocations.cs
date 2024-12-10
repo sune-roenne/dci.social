@@ -8,7 +8,7 @@ namespace DCI.Social.Messages.Locations;
 public static class FOBLocations
 {
     public const string HeadQuartersHub = "hqhub";
-    
 
+    public const string ClientHub = "client";
 
 }
