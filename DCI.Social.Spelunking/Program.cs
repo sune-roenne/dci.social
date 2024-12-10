@@ -1,22 +1,30 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using DCI.Social.Fortification;
 using DCI.Social.Fortification.Encryption;
+using DCI.Social.HeadQuarters;
+using DCI.Social.HeadQuarters.FOB;
 using DCI.Social.Spelunking;
-
-var sample = new SampleForTransport(
-    SampleLong: 232320L,
-    SampleNullableLong: 0L,
-    SampleString: "fjf0320q2ld.vc2'2322",
-    SampleNullableString: "",
-    SampleDate: DateTime.Now,
-    SampleNullableDate: DateTime.MinValue
-   );
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 
-var senderSideEncStream = new SocialEncryptedStream();
-var receiverSideEncStream = new SocialEncryptedStream(senderSideEncStream.Key);
+var builder = WebApplication.CreateBuilder();
+builder.Configuration
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile("appsettings.local.json", optional: true);
+builder.AddFortificationConfiguration();
+builder.AddHeadQuartersConfiguration();
 
-var forTransport = senderSideEncStream.EncryptForTransport(sample);
-var decrypted = receiverSideEncStream.DeserializeFromTransport<SampleForTransport>(forTransport);
+
+builder.AddHeadQuarters();
+builder.AddFortificationEncryption();
+builder.Services.AddHttpClient();
+
+var app = builder.Build();
+
+var service = app.Services.GetRequiredService<IFOBService>();
+
+await Task.Delay(110000);
 
 var tessa = "";

@@ -17,8 +17,12 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
     private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
     private SocialEncryptedStream _stream = new SocialEncryptedStream();
     private readonly RSA _trustedRsaPublicKey;
+    private readonly RSA? _trustedRsaPrivateKey;
     private static readonly RSAEncryptionPadding Padding = RSAEncryptionPadding.Pkcs1;
     private readonly IServiceScopeFactory _scopeFactory;
+
+    private bool _receivedSymmetricKey = false;
+    public bool IsInitiatedWithSymmetricKey => _receivedSymmetricKey;
 
     public FortificationEncryptionService(IOptions<FortificationConfiguration> options, IServiceScopeFactory scopeFactory)
     {
@@ -30,6 +34,15 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
         var certBytes = Convert.FromBase64String(publicKeyString);
         var cert = X509CertificateLoader.LoadCertificate(certBytes);
         _trustedRsaPublicKey = cert.GetRSAPublicKey()!;
+        if(options.Value.TrustedPrivateKeyFile != null)
+        {
+            var privateKeyString = options.Value.TrustedPrivateKeyFile.ReadCertificateFile();
+            var privateKeyBytes = Convert.FromBase64String(privateKeyString);
+            _trustedRsaPrivateKey = RSACng.Create();
+            _trustedRsaPrivateKey.ImportPkcs8PrivateKey(privateKeyBytes, out _);
+
+        }
+
     }
 
     public async Task<T> DecryptFromTransport<T>(string input) where T : class =>
@@ -45,8 +58,12 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
     public async Task<string> EncryptStringForTransport(string input) => 
         await Locked(() => _stream.EncryptForTransport(input), nameof(EncryptStringForTransport));
 
-    public async Task UpdateWithKey(byte[] key) =>
-        await LockedAction(() => _stream = new SocialEncryptedStream(key));
+    public async Task UpdateWithKey(byte[] key) => 
+        await LockedAction(() => { 
+            _stream = new SocialEncryptedStream(key);
+            _receivedSymmetricKey = true;
+        
+        });
 
 
     private async Task<T> LockedAsync<T>(Func<Task<T>> toPerform, string? logString)
@@ -87,9 +104,12 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
 
     public async Task DecryptSymmetricKey(string input)
     {
-        var asBytes = Convert.FromBase64String(input);
-        var decrypted = _trustedRsaPublicKey.Decrypt(asBytes, Padding);
-        await UpdateWithKey(decrypted);
+        if(_trustedRsaPrivateKey != null)
+        {
+            var asBytes = Convert.FromBase64String(input);
+            var decrypted = _trustedRsaPrivateKey.Decrypt(asBytes, Padding);
+            await UpdateWithKey(decrypted);
+        }
     }
 
     private void Log(string message)

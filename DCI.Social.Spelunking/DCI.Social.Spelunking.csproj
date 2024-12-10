@@ -9,6 +9,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DCI.Social.Fortification\DCI.Social.Fortification.csproj" />
+    <ProjectReference Include="..\DCI.Social.HeadQuarters\DCI.Social.HeadQuarters.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

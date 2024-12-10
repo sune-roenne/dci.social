@@ -7,6 +7,7 @@ public static class FileExtensions {
         var polished = read
            .Select(_ => _.Trim())
            .Where(_ => _.Length > 0)
+           .Where(_ => !_.StartsWith("----"))
            .ToList();
         var returnee = string.Join("\n", polished);
         return returnee;   

@@ -10,6 +10,7 @@ public class FortificationConfiguration
     public const string ConfigurationElementName = "Fortification";
 
     public string TrustedCertificateFile { get; set; }
+    public string? TrustedPrivateKeyFile { get; set; }
 
 
 }

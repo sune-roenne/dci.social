@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DCI.Social.Domain\DCI.Social.Domain.csproj" />
+    <ProjectReference Include="..\DCI.Social.Fortification\DCI.Social.Fortification.csproj" />
+  </ItemGroup>
+
 </Project>

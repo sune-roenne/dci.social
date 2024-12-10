@@ -18,5 +18,7 @@ public interface IFortificationEncryptionService
     Task<string> EncryptSymmetricKey();
     Task DecryptSymmetricKey(string input);
 
+    bool IsInitiatedWithSymmetricKey { get; }
+
 
 }
