@@ -1,0 +1,39 @@
+﻿.dci-social-buzzer-buzzer-container {
+    position: absolute;
+    left: 10%;
+    width: 80%;
+    top: 40px;
+    height: 80%;
+
+    background-color: rgba(240,240,240,0.5);
+
+    border-radius: 20px;
+    border-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+
+.dci-social-buzzer-buzzer-button {
+    border-style: none;
+    width: 267px;
+    height: 224px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: transparent;
+}
+
+
+.buzzer-unpressed {
+    background-image: url('images/buzzer/buzzer-unpressed.webp');
+}
+
+.buzzer-pressed {
+    background-image: url('images/buzzer/buzzer-pressed.webp');
+}
+
+.buzzer-pressed-ack {
+    background-image: url('images/buzzer/buzzer-pressed-unlit.webp');
+}

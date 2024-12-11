@@ -4,5 +4,10 @@
 <PageTitle>DCI Social</PageTitle>
 
 <div class="dci-social-layout-main-bg">
-    @Body
+    @if(_user != null)
+    {
+        <CascadingValue Value="_user">
+            @Body
+        </CascadingValue>
+    }
 </div>

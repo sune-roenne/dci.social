@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace DCI.Social.Messages.Client.Buzz;
 public record ClientBuzzerBuzzMessage(
-    string User
+    string User,
+    string? UserName
     ) : AbstractMessage
 {
     public const string MethodName = "ClientBuzzerBuzz";

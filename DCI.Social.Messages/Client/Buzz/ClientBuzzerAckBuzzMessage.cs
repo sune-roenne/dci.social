@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace DCI.Social.Messages.Client.Buzz;
 public record ClientBuzzerAckBuzzMessage(
     string User,
+    string? UserName,
     DateTime RecordedTime
     ) : AbstractMessage
 {

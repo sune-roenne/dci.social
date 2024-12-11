@@ -57,9 +57,9 @@ internal class FOBHubClient : IDisposable
         _hubConnection = builder.Build();
         _hubConnection.On(BuzzerBuzzMessage.MethodName, async (BuzzerBuzzMessage mess) =>
         {
-            var buzz = new Buzz(mess.User, mess.BuzzTime);
+            var buzz = new Buzz(mess.User, mess.UserName, mess.BuzzTime);
             await _fobService.ForwardBuzz(buzz);
-            var ackMess = new BuzzerAckBuzzMessage(buzz.User);
+            var ackMess = new BuzzerAckBuzzMessage(buzz.User, buzz.UserName);
             await _hubConnection.SendAsync(BuzzerAckBuzzMessage.MethodName, ackMess);
         });
 

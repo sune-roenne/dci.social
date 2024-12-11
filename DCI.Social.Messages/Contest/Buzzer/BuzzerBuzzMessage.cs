@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace DCI.Social.Messages.Contest.Buzzer;
 public record BuzzerBuzzMessage(
     string User,
+    string? UserName,
     DateTime BuzzTime
     ) : AbstractMessage
 {

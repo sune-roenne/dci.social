@@ -7,5 +7,6 @@ using System.Threading.Tasks;
 namespace DCI.Social.Domain.Buzzer;
 public record Buzz(
     string User,
+    string? UserName,
     DateTime BuzzTime
     );

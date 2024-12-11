@@ -1,3 +1,12 @@
 ﻿.dci-social-layout-main-bg {
+    content: '';
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/home/layout-background.webp');
+    background-size: cover;
+    background-repeat: no-repeat;
 
 }

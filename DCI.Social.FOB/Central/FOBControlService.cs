@@ -19,9 +19,9 @@ internal class FOBControlService : IFOBControlService
         _scopeFactory = scopeFactory;
     }
 
-    public async Task AcknowledgeBuzz(Buzz buzz) => await WithClientHub(async hub => await hub.Clients.All.SendAsync(ClientAckBuzzMess.MethodName, new ClientAckBuzzMess(buzz.User, buzz.BuzzTime)));
+    public async Task AcknowledgeBuzz(Buzz buzz) => await WithClientHub(async hub => await hub.Clients.All.SendAsync(ClientAckBuzzMess.MethodName, new ClientAckBuzzMess(buzz.User, buzz.UserName, buzz.BuzzTime)));
 
-    public async Task HandleBuzz(Buzz buzz) => await WithHQHub(async hub => await hub.Clients.All.SendAsync(HQBuzzMess.MethodName, new HQBuzzMess(buzz.User, buzz.BuzzTime)));
+    public async Task HandleBuzz(Buzz buzz) => await WithHQHub(async hub => await hub.Clients.All.SendAsync(HQBuzzMess.MethodName, new HQBuzzMess(buzz.User, buzz.UserName, buzz.BuzzTime)));
 
     public async Task StartBuzzerRound() => await WithClientHub(async hub => await hub.Clients.All.SendAsync(ClientStartRoundMess.MethodName, new ClientStartRoundMess()));
 

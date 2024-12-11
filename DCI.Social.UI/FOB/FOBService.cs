@@ -6,6 +6,7 @@ using DCI.Social.Messages.Client.Buzz;
 using DCI.Social.Messages.Contest.Buzzer;
 using DCI.Social.Messages.Locations;
 using DCI.Social.UI.Configuration;
+using DCI.Social.UI.Session;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
@@ -42,11 +43,11 @@ public class FOBService : IFOBService
         InitConnection();
     }
 
-    public async Task Buzz(string userName)
+    public async Task Buzz(DCISocialUser user)
     {
         if(_connection != null)
         {
-            await _connection.SendAsync(ClientBuzzerBuzzMessage.MethodName, new ClientBuzzerBuzzMessage(userName));
+            await _connection.SendAsync(ClientBuzzerBuzzMessage.MethodName, new ClientBuzzerBuzzMessage(User: user.Initials.ToLower(), UserName: user.Name));
         }
     }
 
@@ -68,7 +69,7 @@ public class FOBService : IFOBService
         _connection = builder.Build();
         _connection.On(ClientBuzzerAckBuzzMessage.MethodName, async (ClientBuzzerAckBuzzMessage mess) =>
         {
-            OnBuzzAcknowledged?.Invoke(this, new Buzz(mess.User, mess.RecordedTime));
+            OnBuzzAcknowledged?.Invoke(this, new Buzz(mess.User, mess.UserName, mess.RecordedTime));
         });
         _connection.On(ClientBuzzerStartRoundMessage.MethodName, async (ClientBuzzerStartRoundMessage mess) =>
         {
