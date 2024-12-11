@@ -31,6 +31,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".k8s", ".k8s", "{4EC4DED3-D
 		.k8s\fob.service.yaml = .k8s\fob.service.yaml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bamboo", "Bamboo", "{5074CCA5-28F1-4505-83CB-4CF6194C9791}"
+	ProjectSection(SolutionItems) = preProject
+		bamboo-specs\bamboo.yaml = bamboo-specs\bamboo.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
