@@ -12,7 +12,7 @@ namespace DCI.Social.HeadQuarters.FOB;
 internal class FOBService : IFOBService
 {
     private const int FollowUpDelayInSeconds = 60;
-    private const string SetupShopPath = "hq/setup-shop";
+    private const string SetupShopPath = "hq/setup-shop"; // Trig
 
     private readonly string _fobUrl;
     private readonly IHttpClientFactory _clientFactory;
