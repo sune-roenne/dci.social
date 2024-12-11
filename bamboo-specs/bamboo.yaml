@@ -25,16 +25,15 @@ Build:
   - script: powershell.exe -ExecutionPolicy ByPass -file Scripts\\Build_Core.ps1 
   - script: powershell.exe -ExecutionPolicy ByPass -file Scripts\\Solution_DotNetPack.ps1 -packageFeatureBranches
   - script: powershell.exe -ExecutionPolicy ByPass -file Scripts\\Nuget_Publish.ps1 -source itcm_nuget -nugetDir .\Nuget 
-  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\ReplaceProjectWithPackageReferences.ps1 -searchString "DCI.Social.Domain" 
-  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\ReplaceProjectWithPackageReferences.ps1 -searchString "DCI.Social.Application" 
-  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\ReplaceProjectWithPackageReferences.ps1 -searchString "DCI.Social.Fortification" 
-  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\ReplaceProjectWithPackageReferences.ps1 -searchString "DCI.Social.Messages" 
-  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\RemoveProjectsFromSlnFile.ps1 -searchString "DCI.Social.Domain"
-  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\RemoveProjectsFromSlnFile.ps1 -searchString "DCI.Social.Application"
-  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\RemoveProjectsFromSlnFile.ps1 -searchString "DCI.Social.Fortification"
-  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\RemoveProjectsFromSlnFile.ps1 -searchString "DCI.Social.Messages"
-  - script: powershell.exe -ExecutionPolicy ByPass -file Scripts\\Solution_Package.ps1 -outputDir ".\Source" 
-  - script: powershell.exe -ExecutionPolicy ByPass -file Scripts\\Nuget_Publish.ps1 -source itcm_templates -nugetDir .\Source 
+#  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\ReplaceProjectWithPackageReferences.ps1 -searchString "DCI.Social.Domain" 
+#  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\ReplaceProjectWithPackageReferences.ps1 -searchString "DCI.Social.Application" 
+#  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\ReplaceProjectWithPackageReferences.ps1 -searchString "DCI.Social.Fortification" 
+#  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\ReplaceProjectWithPackageReferences.ps1 -searchString "DCI.Social.Messages" 
+#  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\RemoveProjectsFromSlnFile.ps1 -searchString "DCI.Social.Domain"
+#  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\RemoveProjectsFromSlnFile.ps1 -searchString "DCI.Social.Application"
+#  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\RemoveProjectsFromSlnFile.ps1 -searchString "DCI.Social.Fortification"
+#  - script: powershell.exe -ExecutionPolicy ByPass -file Source\\RemoveProjectsFromSlnFile.ps1 -searchString "DCI.Social.Messages"
+#  - script: powershell.exe -ExecutionPolicy ByPass -file Scripts\\Solution_Package.ps1 -outputDir ".\Source" 
   - script: powershell.exe -ExecutionPolicy ByPass -file Scripts\\Git_Tag.ps1 
   requirements:
   - system.git.executable

@@ -4,6 +4,17 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Company>Nykredit</Company>
+    <Copyright>Nykredit</Copyright>
+    <OutputType>Library</OutputType>
+    <EmbedAllSources>true</EmbedAllSources>
+    <Deterministic>true</Deterministic>
+    <DebugType>embedded</DebugType>
+
   </PropertyGroup>
 
   <ItemGroup>
