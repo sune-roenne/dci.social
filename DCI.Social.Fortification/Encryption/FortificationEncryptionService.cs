@@ -34,7 +34,7 @@ internal class FortificationEncryptionService : IFortificationEncryptionService
         Log($"Using HQ certificate file: {options.Value.TrustedCertificateFile}");
         Log(publicKeyString);
         var certBytes = Convert.FromBase64String(publicKeyString);
-        var cert = X509CertificateLoader.LoadCertificate(certBytes);
+        var cert = new X509Certificate2(certBytes);
         _trustedRsaPublicKey = cert.GetRSAPublicKey()!;
         if(options.Value.TrustedPrivateKeyFile != null)
         {

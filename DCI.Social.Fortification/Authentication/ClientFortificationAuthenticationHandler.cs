@@ -31,7 +31,7 @@ internal class ClientFortificationAuthenticationHandler : AuthenticationHandler<
         _scopeFactory = scopeFactory;
         var publicKeyString = options.CurrentValue.FortificationConfiguration.ClientCertificateFile!.ReadCertificateFile();
         var certBytes = Convert.FromBase64String(publicKeyString);
-        var cert = X509CertificateLoader.LoadCertificate(certBytes);
+        var cert = new X509Certificate2(certBytes);
         _clientPublicKey = cert.GetRSAPublicKey()!;
     }
 
