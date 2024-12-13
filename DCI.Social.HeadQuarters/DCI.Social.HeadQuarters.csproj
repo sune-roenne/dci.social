@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <Folder Include="dbscripts\" />
-    <Folder Include="Persistance\" />
   </ItemGroup>
 
 </Project>
