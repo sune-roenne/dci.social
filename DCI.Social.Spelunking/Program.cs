@@ -7,6 +7,13 @@ using DCI.Social.Spelunking;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using QRCoder;
+
+var gener = new QRCodeGenerator();
+var codeData = gener.CreateQrCode("https://eutonies.com/blackops2024/", QRCodeGenerator.ECCLevel.Q);
+var code = new SvgQRCode(codeData);
+var graphic = code.GetGraphic(20);
+File.WriteAllText("c:\\temp2\\blacops2024.qr.svg", graphic);
 
 
 var builder = WebApplication.CreateBuilder();

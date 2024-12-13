@@ -16,12 +16,18 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.11" />
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="8.23.60" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DCI.Social.Domain\DCI.Social.Domain.csproj" />
     <ProjectReference Include="..\DCI.Social.Fortification\DCI.Social.Fortification.csproj" />
     <ProjectReference Include="..\DCI.Social.Messages\DCI.Social.Messages.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="dbscripts\" />
+    <Folder Include="Persistance\" />
   </ItemGroup>
 
 </Project>

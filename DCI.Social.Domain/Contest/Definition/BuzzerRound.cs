@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DCI.Social.Domain.Contest;
-public record Round(
+namespace DCI.Social.Domain.Contest.Definition;
+public record BuzzerRound(
     long RoundId,
     long ContestId,
     string RoundName,
     TimeSpan RoundTime,
-    int PointsNominal
-    );
+    int Points,
+    Guid SoundId
+    ) : Round(RoundId, ContestId, RoundName, RoundTime, Points);
