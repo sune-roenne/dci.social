@@ -25,5 +25,6 @@ internal class RoundDbo
     public string? Question { get; set; }
     public string? SoundId { get; set; }
     public long? AnswerOption { get; set; }
+    public int AdditionalSeconds { get; set; }
 
 }

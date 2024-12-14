@@ -268,7 +268,9 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
                     RoundName: rnd.RoundName,
                     RoundTime: TimeSpan.FromSeconds(rnd.RoundTimeInSeconds),
                     Points: rnd.PointsNominal,
-                    SoundId: Guid.Parse(rnd.SoundId!)),
+                    SoundId: Guid.Parse(rnd.SoundId!),
+                    AdditionalSeconds: rnd.AdditionalSeconds
+                    ),
                 _ => new QuestionRound(
                     RoundId: rnd.RoundId,
                     ContestId: rnd.ContestId,

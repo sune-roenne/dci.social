@@ -17,10 +17,13 @@ create table dcisoc_contest_round (
   question varchar2(2000),
   soundid varchar2(200),
   answeroption number(10),
+  additionalseconds number(5) default 0 not null enable,
   constraint pk_dcisoc_contest_round primary key(roundid),
   constraint fk_dcisoc_conestt_round_cont foreign key(contestid) references dcisoc_contest(contestid) on delete cascade
 );
 
+
+;
 create table dcisoc_sound (
   soundid varchar2(200) not null enable,
   soundname varchar2(200) not null enable,

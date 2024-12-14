@@ -21,7 +21,9 @@ public static class HeadQuartersDependencyInjection
     {
         builder.Services.AddSingleton<IFOBService, FOBService>();
         builder.Services.AddSingleton<IHeadQuartersContestAdminRepo, HeadQuartersContestAdminRepo>();
+        builder.Services.AddSingleton<IHeadQuartersContestService, HeadQuartersContestService>();
         builder.AddHeadQuartersPersistence();
+
         return builder;
     }
 
