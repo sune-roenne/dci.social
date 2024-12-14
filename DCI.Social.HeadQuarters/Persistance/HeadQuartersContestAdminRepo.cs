@@ -49,6 +49,15 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
 
     });
 
+    public async Task<Contest> UpdateContestHeader(long contestId, string contestName) => await WithContext(async cont =>
+    {
+        var loaded = await cont.Contests.FirstAsync(_ => _.ContestId == contestId);
+        loaded.ContestName = contestName;
+        cont.Update(loaded);
+        await cont.SaveChangesAsync();
+        return contestId;
+    });
+
     public async Task DeleteContest(long contestId)
     {
         await using var cont = await _contextFactory.CreateDbContextAsync();
@@ -285,7 +294,6 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
         foreach (var b in hashedBytes) returnee.Append(b.ToString("x2"));
         return returnee.ToString();
     }
-
 
 
 }

@@ -11,6 +11,7 @@ public interface IHeadQuartersContestAdminRepo
 {
     Task<IReadOnlyCollection<Contest>> LoadShallowContestDefinitions();
     Task<Contest> CreateContest(string contestName);
+    Task<Contest> UpdateContestHeader(long contestId, string contestName);
     Task<Contest> LoadContest(long contestId);
     Task DeleteContest(long contestId);
     Task<Contest> UpsertBuzzerRound(long contestId, long? roundId, string roundName, byte[] bytes, int durationInSeconds, string soundName, int points);

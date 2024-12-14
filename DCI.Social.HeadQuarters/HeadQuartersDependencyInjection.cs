@@ -20,6 +20,7 @@ public static class HeadQuartersDependencyInjection
     public static WebApplicationBuilder AddHeadQuarters(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton<IFOBService, FOBService>();
+        builder.Services.AddSingleton<IHeadQuartersContestAdminRepo, HeadQuartersContestAdminRepo>();
         builder.AddHeadQuartersPersistence();
         return builder;
     }
@@ -28,7 +29,7 @@ public static class HeadQuartersDependencyInjection
     public static WebApplicationBuilder AddHeadQuartersPersistence(this WebApplicationBuilder builder)
     {
         var hqConf = builder.Configuration.HeadQuartersConfig();
-        builder.Services.AddDbContext<SocialDbContext>(opts =>  ConfigureDbContextOptions(opts, hqConf));
+        builder.Services.AddDbContextFactory<SocialDbContext>(opts =>  ConfigureDbContextOptions(opts, hqConf));
         return builder;
     }
 
