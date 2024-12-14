@@ -12,5 +12,6 @@ public record QuestionRound(
     TimeSpan RoundTime,
     int PointsNominal,
     string? Question,
+    long CorrectOptionId,
     IReadOnlyCollection<RoundOption>? RoundOptions
     ) : Round(RoundId, ContestId, RoundName, RoundTime, PointsNominal);

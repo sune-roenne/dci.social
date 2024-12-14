@@ -278,6 +278,7 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
                     RoundTime: TimeSpan.FromSeconds(rnd.RoundTimeInSeconds),
                     PointsNominal: rnd.PointsNominal,
                     Question: rnd.Question,
+                    CorrectOptionId: rnd.AnswerOption!.Value,
                     RoundOptions: roundOptionsMap.TryGetValue(rnd.RoundId, out var opts) ? opts : []
                     )
             }).ToList();
