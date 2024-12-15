@@ -1,5 +1,6 @@
 ﻿using DCI.Social.FOB.Common;
 using DCI.Social.Fortification.Authentication;
+using DCI.Social.Messages.Contest;
 using DCI.Social.Messages.Contest.Buzzer;
 using Microsoft.AspNetCore.Authorization;
 
@@ -24,5 +25,14 @@ public class HeadQuartersHub : FOBHub
     }
 
 
+    public async Task ContestAckRegister(ContestAckRegisterMessage mess) => await WithControllerService(async cont =>
+    {
+        await cont.AckRegistration(mess.UserId, mess.User, mess.UserName, mess.RegistrationTime);
+        return 0;
+    });
 
+    public async Task ContestRegisteredUsers(ContestRegisteredUsersMessage mess) => await WithControllerService(async cont =>
+    {
+
+    });
 }

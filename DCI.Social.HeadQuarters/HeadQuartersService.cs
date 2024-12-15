@@ -2,11 +2,16 @@
 using DCI.Social.Domain.Contest;
 using DCI.Social.Domain.Contest.Definition;
 using DCI.Social.Domain.Contest.Execution;
+using DCI.Social.Fortification.Authentication;
 using DCI.Social.Fortification.Encryption;
 using DCI.Social.HeadQuarters.Configuration;
 using DCI.Social.HeadQuarters.FOB;
 using DCI.Social.HeadQuarters.Persistance;
 using DCI.Social.HeadQuarters.Persistance.Model;
+using DCI.Social.Messages.Contest;
+using DCI.Social.Messages.Contest.Buzzer;
+using DCI.Social.Messages.Locations;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -27,6 +32,7 @@ internal class HeadQuartersService : IHeadQuartersService
 
     private const int FollowUpDelayInSeconds = 60;
     private const string SetupShopPath = "hq/setup-shop";
+    private string FobHubUrl => $"{_fobUrl}{FOBLocations.HeadQuartersHub}";
 
 
     private readonly string _fobUrl;
@@ -36,6 +42,9 @@ internal class HeadQuartersService : IHeadQuartersService
     private readonly CancellationTokenSource _shutdownSource = new CancellationTokenSource();
     private readonly IDbContextFactory<SocialDbContext> _contextFactory;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IFortificationEncryptionService _encService;
+    private readonly CancellationTokenSource _stopSource = new CancellationTokenSource();
+
     private IReadOnlyDictionary<string, long> _userMap = new Dictionary<string, long>();
 
     private Contest? _currentContest;
@@ -43,6 +52,8 @@ internal class HeadQuartersService : IHeadQuartersService
     private int? _currentRoundIndex;
     private byte[]? _cachedSoundBytes;
     private string? _cachedSoundBytesFor;
+    private HubConnection? _hubConnection;
+    
 
 
 
@@ -51,8 +62,10 @@ internal class HeadQuartersService : IHeadQuartersService
         IHttpClientFactory clientFactory,
         IFortificationEncryptionService encryptionService,
         IDbContextFactory<SocialDbContext> contextFactory,
-        IServiceScopeFactory scopeFactory)
+        IServiceScopeFactory scopeFactory,
+        IFortificationEncryptionService encService)
     {
+        _encService = encService;
         _contextFactory = contextFactory;
         _fobUrl = conf.Value.FOBUrl;
         _clientFactory = clientFactory;
@@ -61,6 +74,8 @@ internal class HeadQuartersService : IHeadQuartersService
         CheckForSymmetricKeyUpdate();
         _ = ReloadState();
         _scopeFactory = scopeFactory;
+        InitConnection();
+        StartUserRegistrationBroadcast();
     }
 
 
@@ -144,6 +159,9 @@ internal class HeadQuartersService : IHeadQuartersService
 
     public async Task<byte[]?> LoadSoundBytes(string soundId)
     {
+        var cachedBytes = _cachedSoundBytes;
+        if (_cachedSoundBytesFor == soundId)
+            return cachedBytes;
         await using var cont = await _contextFactory.CreateDbContextAsync();
         var returnee = await cont.Sounds
             .FirstOrDefaultAsync(_ => _.SoundId == soundId);
@@ -302,8 +320,45 @@ internal class HeadQuartersService : IHeadQuartersService
 
         }
         return CurrentStatus()!;
+    }
+
+    private string EncryptedHeader()
+    {
+        var stringTask = _encService.EncryptStringForTransport(FortificationAuthenticationConstants.SampleString);
+        stringTask.Wait();
+        return stringTask.Result;
+    }
+
+
+    private void InitConnection()
+    {
+        var reconnectDelays = new List<TimeSpan>();
+        for (int i = 0; i < 100; i++)
+            reconnectDelays.AddRange(ReconnectDelays);
+
+        var builder = new HubConnectionBuilder()
+            .WithUrl(FobHubUrl, opts =>
+            {
+                var headerValue = EncryptedHeader();
+                if (opts.Headers.ContainsKey(FortificationAuthenticationConstants.HeaderName))
+                    opts.Headers.Remove(FortificationAuthenticationConstants.HeaderName);
+                opts.Headers.Add(FortificationAuthenticationConstants.HeaderName, headerValue);
+            })
+            .WithAutomaticReconnect(reconnectDelays.ToArray());
+        _hubConnection = builder.Build();
+        _hubConnection.On(ContestRegisterMessage.MethodName, async (ContestRegisterMessage mess) =>
+        {
+            var result = await RegisterUser(mess.User.ToLower().Trim(), mess.UserName);
+            if(result != null)
+            {
+                await _hubConnection.SendAsync(ContestAckRegisterMessage.MethodName, new ContestAckRegisterMessage(result.UserId, result.User, result.UserName, DateTime.Now));
+            }
+        });
+        _ = _hubConnection.StartAsync();
 
     }
+
+
 
     private async Task<ContestRegistration?> RegisterUser(string user, string? userName)
     {
@@ -325,6 +380,74 @@ internal class HeadQuartersService : IHeadQuartersService
         }
         return null;
     }
+
+    private void StartUserRegistrationBroadcast()
+    {
+        _ = Task.Run(async () =>
+        {
+            var waitTime = TimeSpan.FromSeconds(30);
+            while (!_stopSource.IsCancellationRequested)
+            {
+                try
+                {
+                    using var scope = _scopeFactory.CreateScope();
+                    var contestRegistrationService = scope.ServiceProvider.GetService<IContestRegistrationService>();
+                    if (contestRegistrationService != null)
+                    {
+                        var loaded = await contestRegistrationService.LoadRegistrations();
+                        var registeredUsers = loaded
+                           .Select(_ => _.User.ToLower().Trim())
+                           .Distinct()
+                           .ToList();
+                        if(_hubConnection != null)
+                        {
+                            await _hubConnection.SendAsync(ContestRegisteredUsersMessage.MethodName, new ContestRegisteredUsersMessage(registeredUsers));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+                await Task.Delay(waitTime);
+            }
+
+        });
+    }
+
+
+
+    private static readonly TimeSpan[] ReconnectDelays = [
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(2),
+                TimeSpan.FromSeconds(2),
+                TimeSpan.FromSeconds(4),
+                TimeSpan.FromSeconds(4),
+                TimeSpan.FromSeconds(4),
+                TimeSpan.FromSeconds(4),
+                TimeSpan.FromSeconds(4),
+                TimeSpan.FromSeconds(4),
+                TimeSpan.FromSeconds(8),
+                TimeSpan.FromSeconds(16),
+                TimeSpan.FromSeconds(16),
+                TimeSpan.FromSeconds(32),
+                TimeSpan.FromSeconds(32),
+                TimeSpan.FromSeconds(32),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64),
+                TimeSpan.FromSeconds(64)
+        ];
+
 
 
 }

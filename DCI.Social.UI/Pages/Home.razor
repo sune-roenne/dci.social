@@ -2,10 +2,10 @@
 @using DCI.Social.Identity
 @attribute [Authorize(Policy = IdentityConstants.IsAuthenticatedPolicyName)]
 
-<PageTitle>DCI Social</PageTitle>
-<div class="dci-social-home-page">
-    @if(_userName != null) {
-        <div class="dci-social-home-user-name">@_userName</div>
-    }
-
+<PageTitle>Black Ops - Operation Red Dawn</PageTitle>
+<div class="dci-social-home-page @(_isRegistered ? "dci-social-registered" : "dci-social-registration")">
+    <button 
+        type="button"
+        disabled="@(_isRegistered ? "disabled" : null)"
+        class="dci-social-register-button"></button>
 </div>

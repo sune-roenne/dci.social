@@ -8,5 +8,6 @@ namespace DCI.Social.Domain.Contest.Execution;
 public record ContestRegistration(
     long UserId,
     string User,
-    string? UserName
+    string? UserName,
+    DateTime RegistrationTime
     );

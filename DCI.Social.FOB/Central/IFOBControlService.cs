@@ -15,5 +15,10 @@ public interface IFOBControlService
     Task HandleBuzz(Buzz buzz);
     Task AcknowledgeBuzz(Buzz buzz);
 
+    Task RegisterUser(string user, string? userName);
+    Task AckRegistration(long userId, string user, string? userName, DateTime registrationTime);
+
+    Task DistributeRegistrations(IReadOnlyCollection<string> users);
+
 
 }

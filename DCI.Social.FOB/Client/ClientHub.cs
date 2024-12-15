@@ -1,5 +1,6 @@
 ﻿using DCI.Social.FOB.Common;
 using DCI.Social.FOB.User;
+using DCI.Social.Messages.Client.Contest;
 using DCI.Social.Messages.Contest;
 using DCI.Social.Messages.Contest.Round;
 using Microsoft.AspNetCore.SignalR;
@@ -45,6 +46,12 @@ public class ClientHub : FOBHub
             }
         }
     }
+
+    public Task ClientContestRegister(ClientContestRegisterMessage message) => WithControllerService(async cont =>
+    {
+        await cont.RegisterUser(message.User, message.UserName);
+        return 1;
+    });
 
 
 

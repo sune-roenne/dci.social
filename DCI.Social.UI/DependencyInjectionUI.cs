@@ -38,7 +38,7 @@ public static class DependencyInjectionUI
             opts.KnownNetworks.Clear();
             opts.KnownProxies.Clear();
         });
-        builder.Services.AddSingleton<IFOBService, FOBService>();
+        builder.Services.AddSingleton<IContestService, ContestService>();
         return builder;
     }
 

@@ -9,6 +9,6 @@ namespace DCI.Social.HeadQuarters;
 public interface IContestRegistrationService
 {
     Task<ContestRegistration?> Register(long userId, string user, string? userName, long contest);
-
+    Task<IReadOnlyCollection<ContestRegistration>> LoadRegistrations();
 
 }

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.SignalR;
 using HQBuzzMess = DCI.Social.Messages.Contest.Buzzer.BuzzerBuzzMessage;
 using ClientAckBuzzMess = DCI.Social.Messages.Client.Buzz.ClientBuzzerAckBuzzMessage;
 using ClientStartRoundMess = DCI.Social.Messages.Client.Buzz.ClientBuzzerStartRoundMessage;
+using DCI.Social.Messages.Contest;
+using DCI.Social.Messages.Client.Contest;
 
 namespace DCI.Social.FOB.Central;
 
@@ -47,5 +49,18 @@ internal class FOBControlService : IFOBControlService
         await toPerform(scope);
     }
 
+    public Task RegisterUser(string user, string? userName) => WithHQHub(async cont =>
+    {
+        await cont.Clients.All.SendAsync(ContestRegisterMessage.MethodName, new ContestRegisterMessage(User: user, UserName: userName));
+    });
 
+    public Task AckRegistration(long userId, string user, string? userName, DateTime registrationTime) => WithClientHub(async cont =>
+    {
+        await cont.Clients.All.SendAsync(ClientContestAckRegisterMessage.MethodName, new ClientContestAckRegisterMessage(userId, user, userName, registrationTime));
+    });
+
+    public Task DistributeRegistrations(IReadOnlyCollection<string> users) => WithClientHub(async cont =>
+    {
+        await cont.Clients.All.SendAsync(ClientContestRegisteredUsersMessage.MethodName, new ClientContestRegisteredUsersMessage(users));
+    });
 }
