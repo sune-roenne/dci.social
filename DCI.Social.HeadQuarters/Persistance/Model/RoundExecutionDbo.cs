@@ -15,8 +15,9 @@ internal class RoundExecutionDbo
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long RoundExecutionId { get; set; }
-    public long ContestId { get; set; }
-    public string ContestName { get; set; }
+    public long ExecutionId { get; set; }
+    public long RoundId { get; set; }
+    public string RoundName { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public long? AnswerOption { get; set; }

@@ -337,5 +337,27 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
         return returnee.ToString();
     }
 
+    public async Task StartContest(long contestId)
+    {
+        await using var cont = await _contextFactory.CreateDbContextAsync();
+        var existingExecution = await cont.Executions
+            .FirstOrDefaultAsync(_ => _.EndTime == null);
+        if(existingExecution == null)
+        {
+            var relCont = await cont.Contests
+                .FirstOrDefaultAsync(_ => _.ContestId == contestId);
+            if(relCont != null)
+            {
+                var insertee = new ContestExecutionDbo
+                {
+                    ContestId = contestId,
+                    ContestName = relCont.ContestName,
+                    StartTime = DateTime.Now
+                };
+                cont.Add(insertee);
+                await cont.SaveChangesAsync();
+            }
 
+        }
+    }
 }

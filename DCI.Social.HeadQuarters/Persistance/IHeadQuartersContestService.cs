@@ -8,7 +8,5 @@ namespace DCI.Social.HeadQuarters.Persistance;
 public interface IHeadQuartersContestService
 {
 
-    Task<byte[]?> LoadSoundBytes(string soundId);
-
 
 }

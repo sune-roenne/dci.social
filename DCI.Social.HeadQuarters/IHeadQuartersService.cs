@@ -11,10 +11,22 @@ using System.Threading.Tasks;
 namespace DCI.Social.HeadQuarters;
 public interface IHeadQuartersService
 {
-
-    Task<ExecutionStatus> StartContest(Contest contest);
+    void UpdateUserMapping(IReadOnlyDictionary<string, long> userIdMap);
     Task<ExecutionStatus> NextRound();
     Task<ExecutionStatus> PreviousRound();
+    Task<ExecutionStatus> StartRound();
+    ExecutionStatus? CurrentStatus();
+
+    bool HasPreviousRound();
+    bool HasNextRound();
+
+    Task<byte[]?> LoadSoundBytes(string soundId);
+
+
+
+    Task ReloadState();
+
+    Task<ExecutionStatus> MarkWinner(long roundExecutionId, long userId);
 
     event EventHandler<IReadOnlyCollection<Buzz>> OnBuzz;
 

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DCI.Social.Domain.Contest.Execution;
 
 namespace DCI.Social.HeadQuarters.Persistance.Model;
 [Table(TableName)]
@@ -19,5 +20,13 @@ internal class ContestExecutionDbo
     public string ContestName { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
+
+    public ContestExecution ToDomain() => new ContestExecution(
+        ExecutionId: ExecutionId,
+        ContestName: ContestName,
+        StartTime: StartTime,
+        EndTime: EndTime
+        );
+
 
 }

@@ -21,4 +21,6 @@ public interface IHeadQuartersContestAdminRepo
     Task<Contest> DeleteRound(long roundId);
     Task<Contest> SwapIndexes(long firstRoundId, long secondRoundId);
 
+    Task StartContest(long contestId);
+
 }

@@ -12,4 +12,11 @@ public record Contest(
     )
 {
     public readonly int TotalPointsNominal = Rounds.Sum(_ => _.PointsNominal);
+
+    private Round[] _roundsArr => Rounds.ToArray();
+    public bool HasRoundNo(int roundNo) => Rounds.Count > roundNo;
+
+    public Round this[int roundNo] => _roundsArr[roundNo];
+
+
 }

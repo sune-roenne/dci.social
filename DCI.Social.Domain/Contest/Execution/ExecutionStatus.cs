@@ -10,6 +10,5 @@ namespace DCI.Social.Domain.Contest.Execution;
 public record ExecutionStatus(
     ContestDef Contest,
     ContestExecution Execution,
-    Round CurrentRound,
-    RoundExecution? RoundExecution
+    Round CurrentRound
     );

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DCI.Social.Domain.Contest.Definition;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,5 +17,18 @@ internal class ContestDbo
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long ContestId { get; set; }
     public string ContestName { get; set; }
+
+    public Contest ToDomain(IEnumerable<RoundDbo> rounds, IDictionary<long, IEnumerable<RoundOptionDbo>> roundOptions, IDictionary<long, string> roundSongNames) => new Contest(
+        ContestId: ContestId,
+        ContestName: ContestName,
+        Rounds: rounds
+            .OrderBy(_ => _.RoundIndex)
+            .Select(_ =>
+               _.ToDomain(
+                   options: roundOptions.TryGetValue(_.RoundId, out var opts) ? opts : null,
+                   songName: roundSongNames.TryGetValue(_.RoundId, out var nam) ? nam : null
+            )).ToList()
+        );
+
 
 }
