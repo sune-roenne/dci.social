@@ -8,6 +8,7 @@ using DCI.Social.HeadQuarters.FOB;
 using DCI.Social.HeadQuarters.Persistance;
 using DCI.Social.HeadQuarters.Persistance.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,7 @@ internal class HeadQuartersService : IHeadQuartersService
     private readonly SemaphoreSlim _shopLock = new SemaphoreSlim(1);
     private readonly CancellationTokenSource _shutdownSource = new CancellationTokenSource();
     private readonly IDbContextFactory<SocialDbContext> _contextFactory;
+    private readonly IServiceScopeFactory _scopeFactory;
     private IReadOnlyDictionary<string, long> _userMap = new Dictionary<string, long>();
 
     private Contest? _currentContest;
@@ -45,10 +47,11 @@ internal class HeadQuartersService : IHeadQuartersService
 
 
     public HeadQuartersService(
-        IOptions<HeadQuartersConfiguration> conf, 
-        IHttpClientFactory clientFactory, 
+        IOptions<HeadQuartersConfiguration> conf,
+        IHttpClientFactory clientFactory,
         IFortificationEncryptionService encryptionService,
-        IDbContextFactory<SocialDbContext> contextFactory)
+        IDbContextFactory<SocialDbContext> contextFactory,
+        IServiceScopeFactory scopeFactory)
     {
         _contextFactory = contextFactory;
         _fobUrl = conf.Value.FOBUrl;
@@ -57,6 +60,7 @@ internal class HeadQuartersService : IHeadQuartersService
         _ = SetupShop();
         CheckForSymmetricKeyUpdate();
         _ = ReloadState();
+        _scopeFactory = scopeFactory;
     }
 
 
@@ -300,5 +304,27 @@ internal class HeadQuartersService : IHeadQuartersService
         return CurrentStatus()!;
 
     }
+
+    private async Task<ContestRegistration?> RegisterUser(string user, string? userName)
+    {
+        user = user.ToLower().Trim();
+        if(_currentContest != null)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            if(_userMap.TryGetValue(user, out var userId))
+            {
+                var contestRegistrationService = scope.ServiceProvider.GetService<IContestRegistrationService>();
+                if (contestRegistrationService != null)
+                {
+                    var registrationResult = await contestRegistrationService.Register(userId, user, userName, _currentContest.ContestId);
+                    return registrationResult;
+                }
+
+            }
+
+        }
+        return null;
+    }
+
 
 }

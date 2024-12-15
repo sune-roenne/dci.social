@@ -10,4 +10,8 @@
     <ProjectReference Include="..\DCI.Social.Domain\DCI.Social.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistence\" />
+  </ItemGroup>
+
 </Project>
