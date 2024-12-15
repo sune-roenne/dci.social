@@ -279,6 +279,13 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
         var rounds = await cont.Rounds.Where(_ => _.ContestId == contestId).ToListAsync();
         var roundIds = rounds.Select(_ => _.RoundId).ToHashSet();
         var roundOptions = roundIds.Any() ? await cont.RoundOptions.Where(_ => roundIds.Contains(_.RoundId)).ToListAsync() : [];
+        var songNames = (await (from snd in cont.Sounds
+                                join rnd in cont.Rounds.Where(_ => _.ContestId == contestId)
+                                on snd.SoundId equals rnd.SoundId
+                                select new { rnd.RoundId, snd.SoundName }).ToListAsync())
+                         .Where(_ => !string.IsNullOrWhiteSpace(_.SoundName))
+                         .GroupBy(_ => _.RoundId)
+                         .ToDictionary(_ => _.Key, _ => _.First().SoundName);
         var roundOptionsMap = roundOptions
             .GroupBy(_ => _.RoundId)
             .ToDictionary(
@@ -300,7 +307,8 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
                     RoundTime: TimeSpan.FromSeconds(rnd.RoundTimeInSeconds),
                     Points: rnd.PointsNominal,
                     SoundId: Guid.Parse(rnd.SoundId!),
-                    AdditionalSeconds: rnd.AdditionalSeconds
+                    AdditionalSeconds: rnd.AdditionalSeconds,
+                    SongName: songNames.TryGetValue(rnd.RoundId, out var songName) ? songName : "Unknown"
                     ),
                 _ => new QuestionRound(
                     RoundId: rnd.RoundId,

@@ -12,5 +12,6 @@ public record BuzzerRound(
     TimeSpan RoundTime,
     int Points,
     Guid SoundId,
-    int AdditionalSeconds
+    int AdditionalSeconds,
+    string? SongName
     ) : Round(RoundId, ContestId, RoundName, RoundTime, Points);
