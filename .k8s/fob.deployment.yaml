@@ -18,18 +18,28 @@ spec:
         - name: hq-crt-volume
           secret:
             secretName: fob-certs-hq          
+        - name: social-crt-volume
+          secret:
+            secretName: fob-certs-social
+
 
       containers:
       - name: fob
-        image: docker.io/suneroenne/dcifob:1.0.5
+        image: docker.io/suneroenne/dcifob:1.0.12
         ports:
         - containerPort: 8080
           name: http-fob
         env:
         - name: Fortification__TrustedCertificateFile
           value: /hq-crt-volume/tls.crt
+        - name: Fortification__ClientCertificateFile
+          value: /social-crt-volume/tls.crt
+
         volumeMounts:
                 - name: hq-crt-volume
                   readOnly: true
                   mountPath: "/hq-crt-volume"              
+                - name: social-crt-volume
+                  readOnly: true
+                  mountPath: "/social-crt-volume"              
           
