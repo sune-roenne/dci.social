@@ -45,6 +45,7 @@ public class HeadQuartersHub : FOBHub
 
     public async Task ContestRegisteredUsers(ContestRegisteredUsersMessage mess) => await WithControllerService(async cont =>
     {
-
+        await cont.DistributeRegistrations(mess.RegisteredUsers);
+        return 0;
     });
 }
