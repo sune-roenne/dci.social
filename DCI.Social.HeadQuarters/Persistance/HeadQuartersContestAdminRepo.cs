@@ -85,14 +85,14 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
             .ToArrayAsync();
         var firstsIndex = forSwapping[0].RoundIndex;
         forSwapping[0].RoundIndex = forSwapping[1].RoundIndex;
-        forSwapping[0].RoundIndex = firstsIndex;
+        forSwapping[1].RoundIndex = firstsIndex;
         cont.UpdateRange(forSwapping);
         await cont.SaveChangesAsync();
         return forSwapping[0].ContestId;
 
     });
 
-    public Task<Contest> UpsertBuzzerRound(long contestId, long? roundId, string roundName, byte[] bytes, int durationInSeconds, string soundName, int points) => UpsertRound(
+    public Task<Contest> UpsertBuzzerRound(long contestId, long? roundId, string roundName, byte[] bytes, int durationInSeconds, string soundName, int points, int extraSeconds) => UpsertRound(
         contestId,
         roundId,
         newRoundCreator: soundId => new RoundDbo
@@ -101,15 +101,42 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
             RoundName = roundName,
             PointsNominal = points,
             RoundTimeInSeconds = durationInSeconds,
-            RoundType = RoundTypeDbo.Buzzer.ToString()
+            RoundType = RoundTypeDbo.Buzzer.ToString(),
+            SoundId = soundId,
+            AdditionalSeconds = extraSeconds
+
         },
         existingRoundModificer: (soundId, round) =>
         {
             round.RoundName = roundName;
             round.SoundId = soundId;
             round.RoundTimeInSeconds = durationInSeconds;
+            round.AdditionalSeconds = extraSeconds;
         },
         soundProducer: () => (bytes, durationInSeconds, soundName));
+
+    public Task<Contest> UpsertBuzzerRound(long contestId, long? roundId, string roundName, string existingSoundId, int durationInSeconds, int points, int extraSeconds) => UpsertRound(
+        contestId,
+        roundId,
+        newRoundCreator: soundId => new RoundDbo
+        {
+            ContestId = contestId,
+            RoundName = roundName,
+            PointsNominal = points,
+            RoundTimeInSeconds = durationInSeconds,
+            RoundType = RoundTypeDbo.Buzzer.ToString(),
+            SoundId = soundId,
+            AdditionalSeconds = extraSeconds
+        },
+        existingRoundModificer: (soundId, round) =>
+        {
+            round.RoundName = roundName;
+            round.SoundId = soundId;
+            round.RoundTimeInSeconds = durationInSeconds;
+            round.AdditionalSeconds = extraSeconds;
+        },
+        soundProducer: null,
+        existingSoundId: existingSoundId);
 
 
     public Task<Contest> UpsertOptionRound(long contestId, long? roundId, string roundName, int points, int durationInSeconds, string question, IReadOnlyCollection<(RoundOption Option, bool IsCorrect)> options) => UpsertRound(
@@ -135,12 +162,15 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
             if (options.Any())
             {
                 var nameOfCorrectOption = options.Where(_ => _.IsCorrect).Select(_ => _.Option.OptionName).FirstOrDefault();
-                var toInsert = options.Select(_ => _.Option).ToList();
+                var toInsert = options
+                    .Select(_ => _.Option)
+                    .Select((_, indx) => new RoundOptionDbo { RoundId = round.RoundId, OptionIndex = indx, OptionName = _.OptionName})
+                    .ToList();
                 cont.AddRange(toInsert);
                 await cont.SaveChangesAsync();
                 if (nameOfCorrectOption != null)
                 {
-                    var correctId = toInsert.First(_ => _.OptionName == nameOfCorrectOption).OptionId;
+                    var correctId = toInsert.First(_ => _.OptionName == nameOfCorrectOption).RoundOptionId;
                     round.AnswerOption = correctId;
                     cont.Update(round);
                     await cont.SaveChangesAsync();
@@ -154,10 +184,11 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
         Func<string?, RoundDbo> newRoundCreator,
         Action<string?, RoundDbo> existingRoundModificer,
         Func<(byte[] Bytes, int Duration, string SoundName)>? soundProducer = null,
+        string? existingSoundId = null,
         Func<SocialDbContext, RoundDbo, Task>? optionsSaver = null) => await WithContext(async cont =>
     {
-        string? soundId = null;
-        if(soundProducer != null)
+        var soundId = existingSoundId;
+        if(soundId == null && soundProducer != null)
         {
             var (bytes, durationInSeconds, soundName) = soundProducer();
             soundId = await EnsureSound(cont, bytes, durationInSeconds, soundName);
@@ -210,7 +241,7 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
         var retry = true;
         while (retry)
         {
-            var usingId = cont.Sounds.FirstOrDefaultAsync(_ => _.SoundId == soundId.ToString());
+            var usingId = await cont.Sounds.FirstOrDefaultAsync(_ => _.SoundId == soundId.ToString());
             if(usingId == null)
                 retry = false;
             else

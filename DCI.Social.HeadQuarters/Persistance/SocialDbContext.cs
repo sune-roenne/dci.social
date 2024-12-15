@@ -39,6 +39,7 @@ internal class SocialDbContext : DbContext
             .HasKey(_ => new {_.RoundExecutionId, _.UserId});
         modelBuilder.Entity<RoundExecutionSelectionDbo>().SetUpperCaseIdentifiers()
             .HasKey(_ => new { _.RoundExecutionId, _.UserId });
+        modelBuilder.Entity<SoundDbo>().SetUpperCaseIdentifiers();
 
 
     }

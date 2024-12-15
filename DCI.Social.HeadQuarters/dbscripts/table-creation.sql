@@ -48,7 +48,7 @@ create table dcisoc_contest_round_option (
   constraint fk_dcisoc_contest_round_option_rnd foreign key(roundid) references dcisoc_contest_round(roundid) on delete cascade
 );
 
-create unique index idx_dcisoc_contest_round_option_nam on dcisoc_contest_round_option(optionname);
+create unique index idx_dcisoc_contest_round_option_nam on dcisoc_contest_round_option(roundid, optionname);
 create unique index idx_dcisoc_contest_round_option_idx on dcisoc_contest_round_option(roundid, optionindex);
 
 
