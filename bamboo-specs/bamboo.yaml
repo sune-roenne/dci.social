@@ -38,5 +38,5 @@ Build:
   requirements:
   - system.git.executable
   - system.builder.command.Nuget
-  - system.builder.msbuild.MsBuild 2019
+  - system.builder.msbuild.MsBuild 2022
   - system.builder.command.OctopusCli
