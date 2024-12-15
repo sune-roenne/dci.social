@@ -62,6 +62,7 @@ internal class FOBHubClient : IDisposable
             var ackMess = new BuzzerAckBuzzMessage(buzz.User, buzz.UserName);
             await _hubConnection.SendAsync(BuzzerAckBuzzMessage.MethodName, ackMess);
         });
+        _ = _hubConnection.StartAsync();
 
     }
 

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="QRCoder" Version="1.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DCI.Social.Fortification\DCI.Social.Fortification.csproj" />
     <ProjectReference Include="..\DCI.Social.HeadQuarters\DCI.Social.HeadQuarters.csproj" />
   </ItemGroup>

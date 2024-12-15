@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DCI.Social.Domain.Contest;
+namespace DCI.Social.Domain.Contest.Definition;
 public record Contest(
     long ContestId,
     string ContestName,

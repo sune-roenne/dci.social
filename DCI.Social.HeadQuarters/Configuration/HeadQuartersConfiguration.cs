@@ -11,4 +11,6 @@ public class HeadQuartersConfiguration
 
     public string FOBUrl { get; set; }
 
+    public HeadQuartersDbConfiguration Db { get; set; }
+
 }
