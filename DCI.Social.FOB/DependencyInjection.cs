@@ -33,7 +33,6 @@ public static class DependencyInjection
         builder.Services.AddOpenApi();
         builder.Services.AddSignalR(opts =>
         {
-
         });
     }
 

@@ -32,14 +32,17 @@ public class FOBService : IFOBService
     public FOBService(IServiceScopeFactory scopeFactory, IOptions<FortificationConfiguration> fortConf, IOptions<UIConfiguration> uiConf)
     {
         _scopeFactory = scopeFactory;
+        using var scope = _scopeFactory.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<FOBService>>();
         _fobUrl = uiConf.Value.FOBUrl;
         var privateKeyString = fortConf.Value.ClientPrivateKeyFile!.ReadCertificateFile();
         var privateKeyBytes = Convert.FromBase64String(privateKeyString);
         var privateKey = RSACng.Create();
         privateKey.ImportPkcs8PrivateKey(privateKeyBytes, out _);
+
         var unEncryptedBytes = UTF8Encoding.UTF8.GetBytes(FortificationAuthenticationConstants.SampleString);
-        var encryptedBytes = privateKey.Encrypt(unEncryptedBytes, Padding);
-        _encryptedHeader = Convert.ToBase64String(encryptedBytes);
+        /*var encryptedBytes = privateKey.Encrypt(unEncryptedBytes, Padding);*/
+        _encryptedHeader = Convert.ToBase64String(unEncryptedBytes);
         InitConnection();
     }
 
@@ -59,9 +62,12 @@ public class FOBService : IFOBService
             reconnectDelays.AddRange(ReconnectDelays);
 
         var builder = new HubConnectionBuilder()
+            .ConfigureLogging(opts => {
+                opts.AddConsole(consOpts => {
+                });
+            })
             .WithUrl(FobHubUrl, opts =>
             {
-                
                 if (!opts.Headers.ContainsKey(FortificationAuthenticationConstants.HeaderName))
                     opts.Headers.Add(FortificationAuthenticationConstants.HeaderName, _encryptedHeader);
             })
@@ -75,6 +81,8 @@ public class FOBService : IFOBService
         {
             OnBuzzerRoundStart?.Invoke(this, "Start the round Sam!");
         });
+
+        _ = _connection.StartAsync();
 
 
     }

@@ -5,7 +5,9 @@
 <PageTitle>DCI Social</PageTitle>
 <div class="dci-social-home-page">
     @if(_userName != null) {
-        <div class="dci-social-home-user-name">@_userName</div>
+        <div class="dci-social-home-user-name-container">
+           <div class="dci-social-home-user-name">You are @_userName</div>
+        </div>
     }
 
 </div>

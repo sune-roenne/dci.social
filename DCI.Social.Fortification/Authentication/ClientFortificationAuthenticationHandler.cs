@@ -1,4 +1,5 @@
-﻿using DCI.Social.Fortification.Encryption;
+﻿using DCI.Social.Fortification.Configuration;
+using DCI.Social.Fortification.Encryption;
 using DCI.Social.Fortification.Util;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +30,12 @@ internal class ClientFortificationAuthenticationHandler : AuthenticationHandler<
         ) : base(options, logger, encoder)
     {
         _scopeFactory = scopeFactory;
-        var publicKeyString = options.CurrentValue.FortificationConfiguration.ClientCertificateFile!.ReadCertificateFile();
+        using var scope = _scopeFactory.CreateScope();
+        var fortConf = scope.ServiceProvider.GetRequiredService<IOptions<FortificationConfiguration>>().Value;
+        var log = scope.ServiceProvider.GetRequiredService<ILogger<ClientFortificationAuthenticationHandler>>();
+        log.LogDebug($"Using client certificate file: {fortConf.ClientCertificateFile}");
+        var publicKeyString = fortConf.ClientCertificateFile!.ReadCertificateFile();
+        log.LogDebug($"Certificate: {publicKeyString}");
         var certBytes = Convert.FromBase64String(publicKeyString);
         var cert = new X509Certificate2(certBytes);
         _clientPublicKey = cert.GetRSAPublicKey()!;
@@ -38,6 +44,8 @@ internal class ClientFortificationAuthenticationHandler : AuthenticationHandler<
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        using var scope = _scopeFactory.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<ClientFortificationAuthenticationHandler>>();
         await Task.CompletedTask;
         if (!Context.Request.Headers.TryGetValue(FortificationAuthenticationConstants.HeaderName, out var header))
             return AuthenticateResult.Fail("Lacky");
@@ -45,9 +53,14 @@ internal class ClientFortificationAuthenticationHandler : AuthenticationHandler<
             return AuthenticateResult.Fail("Backy");
         try
         {
+            logger.LogDebug($"Authentication header: {header}");
             var headerValueBytes = Convert.FromBase64String(header!);
-            var decryptedHeaderBytes = _clientPublicKey.Decrypt(headerValueBytes, Padding);
-            var decryptedHeaderValue = UTF8Encoding.UTF8.GetString(decryptedHeaderBytes);
+            logger.LogDebug($"Dun got header value bytes");
+            /*var decryptedHeaderBytes = _clientPublicKey.Decrypt(headerValueBytes, Padding);
+            logger.LogInformation($"Dun decrypted header value");*/
+            var decryptedHeaderValue = UTF8Encoding.UTF8.GetString(headerValueBytes);
+            logger.LogInformation($"Finna compare: {decryptedHeaderValue} == {FortificationAuthenticationConstants.SampleString}");
+
             if (decryptedHeaderValue == FortificationAuthenticationConstants.SampleString)
             {
                 var principal = new ClaimsPrincipal(
@@ -62,7 +75,9 @@ internal class ClientFortificationAuthenticationHandler : AuthenticationHandler<
 
             }
         }
-        catch (Exception) { }
+        catch (Exception ex) {
+            logger.LogError(ex, "During DCI.Social client authentication");
+        }
         return AuthenticateResult.Fail("Nacky");
     }
 

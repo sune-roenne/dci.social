@@ -2,10 +2,15 @@
 using DCI.Social.FOB.User;
 using DCI.Social.Messages.Contest;
 using DCI.Social.Messages.Contest.Round;
+using DCI.Social.Fortification.Authentication;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
+using DCI.Social.Messages.Client.Buzz;
+using DCI.Social.Domain.Buzzer;
+
 
 namespace DCI.Social.FOB.Client;
-
+[Authorize(AuthenticationSchemes = FortificationAuthenticationConstants.ClientAuthenticationType)]
 public class ClientHub : FOBHub
 {
 
@@ -44,6 +49,14 @@ public class ClientHub : FOBHub
                 await Clients.Caller.SendAsync(RoundConstants.ClientMethodNames.ConfirmOptionSubmitted);
             }
         }
+    }
+
+    public async Task ClientBuzzerBuzz(ClientBuzzerBuzzMessage mess) 
+    {
+        await WithControllerAction(async cont => {
+            await cont.HandleBuzz(new Buzz(mess.User.ToLower(), mess.UserName, DateTime.Now));
+        });
+        await Clients.Caller.SendAsync(ClientBuzzerAckBuzzMessage.MethodName, new ClientBuzzerAckBuzzMessage(mess.User, mess.UserName, DateTime.Now));
     }
 
 
