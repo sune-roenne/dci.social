@@ -62,18 +62,21 @@ public class ClientHub : FOBHub
 
     public Task ClientContestRegister(ClientContestRegisterMessage message) => WithControllerService(async cont =>
     {
+        Log($"Received client register message for {message.User}");
         await cont.RegisterUser(message.User, message.UserName);
         return 1;
     });
 
     public Task ClientContestBuzz(ClientContestBuzzMessage message) => WithControllerService(async cont =>
     {
+        Log($"Received client BUZZ message for {message.User}");
         await cont.HandleContestBuzz(message.RoundExecutionId, message.User);
         return 1;
     });
 
     public Task ClientContestRegisterAnswer(ClientContestRegisterAnswerMessage message) => WithControllerService(async cont =>
     {
+        Log($"Received client answer message for {message.User}");
         await cont.SubmitContestAnswer(message.RoundExecutionId, message.User, message.SelectedOptionId);
         return 1;
     });

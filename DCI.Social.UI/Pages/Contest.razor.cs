@@ -16,6 +16,9 @@ public partial class Contest : IDisposable
     [Inject]
     public IContestService ContestService { get; set; }
 
+    [Inject]
+    public IServiceScopeFactory ScopeFactory { get; set; }
+
     private bool _isBuzzerRound = true;
     private RoundOption[]? _currentRoundOptions;
     private string? _currentQuestion;
@@ -101,13 +104,24 @@ public partial class Contest : IDisposable
 
     private void OnBuzzerClick()
     {
+        Log("Asked to buzz");
         if (User != null && _currentRoundExecutionId != null)
         {
+            Log("Going to send buzz");
             _ = ContestService.Buzz(User.Initials, _currentRoundExecutionId.Value);
             _buzzed = true;
         }
 
     }
+
+    private void Log(string mess) {
+        using var scope = ScopeFactory.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<ContestService>>();
+        logger.LogInformation(mess);
+    }
+
+
+
     public void Dispose()
     {
         if(_hasRegistered)

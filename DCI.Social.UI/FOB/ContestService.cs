@@ -106,8 +106,8 @@ public class ContestService : IContestService
         _connection.On(ClientContestStartRoundMessage.MethodName, (ClientContestStartRoundMessage mess) => HandleStartMessage(mess));
         _connection.On(ClientContestEndRoundMessage.MethodName, (ClientContestEndRoundMessage mess) => HandleEndMessage(mess));
         _connection.On(ClientContestAckBuzzMessage.MethodName, (ClientContestAckBuzzMessage mess) => HandleAckBuzzMessage(mess));
-
         _connection.StartAsync();
+        Log("Inited FOB connection");
 
     }
 
@@ -119,6 +119,7 @@ public class ContestService : IContestService
 
     private void HandleStartMessage(ClientContestStartRoundMessage mess)
     {
+        Log("Handling round start message");
         _ackedBuzzUsers.Clear();
         _currentRoundExecution = new RoundExecution(
             RoundExecutionId: mess.RoundExecutionId,
@@ -145,6 +146,8 @@ public class ContestService : IContestService
     }
     private void HandleEndMessage(ClientContestEndRoundMessage mess)
     {
+        Log("Handling roundend  message");
+
         _currentRoundExecution = null;
         _currentOptions = null;
     }
@@ -152,6 +155,8 @@ public class ContestService : IContestService
 
     private void HandleAckBuzzMessage(ClientContestAckBuzzMessage mess)
     {
+        Log("Handling ack buzz message");
+
         _ = Task.Run(async () =>
         {
             if (_currentRoundExecution != null && _currentRoundExecution.RoundExecutionId == mess.RoundExecutionId)
@@ -173,17 +178,22 @@ public class ContestService : IContestService
 
     public async Task Buzz(string user, long roundExecutionId)
     {
+        Log("Asked to buzz");
         if(_connection != null)
         {
             await _connection.SendAsync(ClientContestBuzzMessage.MethodName, new ClientContestBuzzMessage(roundExecutionId, user, DateTime.Now));
+        Log("Forwarded buzz");
+
         }
     }
 
     public async Task SubmitAnswer(string user, long roundExecutionId, long optionId)
     {
+        Log("Asked to submit answer");
         if (_connection != null)
         {
             await _connection.SendAsync(ClientContestRegisterAnswerMessage.MethodName, new ClientContestRegisterAnswerMessage(roundExecutionId, user, optionId));
+            Log("Forwarded answer");
         }
     }
 
@@ -217,5 +227,12 @@ public class ContestService : IContestService
                 TimeSpan.FromSeconds(64),
                 TimeSpan.FromSeconds(64)
     ];
+
+    private void Log(string mess) {
+        using var scope = _scopeFactory.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<ContestService>>();
+        logger.LogInformation(mess);
+
+    }
 
 }

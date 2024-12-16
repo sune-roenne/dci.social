@@ -27,5 +27,11 @@ public class FOBHub : Hub
             return 0;
         });
 
+    protected void Log(string mess) {
+        using var scope = _scopeFactory.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<FOBHub>>();
+        logger.LogInformation(mess);
+    }    
+
 
 }

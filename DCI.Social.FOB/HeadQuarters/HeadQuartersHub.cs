@@ -40,18 +40,23 @@ public class HeadQuartersHub : FOBHub
 
     public async Task ContestAckRegister(ContestAckRegisterMessage mess) => await WithControllerService(async cont =>
     {
+        Log($"Received HQ ack register for {mess.User}");
+
         await cont.AckRegistration(mess.UserId, mess.User, mess.UserName, mess.RegistrationTime);
         return 0;
     });
 
     public async Task ContestRegisteredUsers(ContestRegisteredUsersMessage mess) => await WithControllerService(async cont =>
     {
+        Log($"Received HQ registered users message");
         await cont.DistributeRegistrations(mess.RegisteredUsers);
         return 0;
     });
 
     public async Task ContestStartRound(ContestStartRoundMessage mess) => await WithControllerService(async cont =>
     {
+        Log($"Received HQ round start message");
+
         var opts = mess.Options == null ? null : mess.Options
             .Select(_ => new RoundOption(_.OptionId, _.OptionValue))
             .ToList();
@@ -61,12 +66,15 @@ public class HeadQuartersHub : FOBHub
 
     public async Task ContestEndRound(ContestEndRoundMessage mess) => await WithControllerService(async cont =>
     {
+        Log($"Received HQ end round message");
+
         await cont.EndContestRound(mess.RoundExecutionId);
         return 0;
     });
 
     public async Task ContestAckBuzz(ContestAckBuzzMessage mess) => await WithControllerService(async cont =>
     {
+        Log($"Received HQ ack buzz message");
         await cont.HandleContestAckBuzz(mess.RoundExecutionId, mess.UserName, mess.RegistrationTime);
         return 0;
     });
