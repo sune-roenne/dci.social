@@ -134,6 +134,7 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
             round.SoundId = soundId;
             round.RoundTimeInSeconds = durationInSeconds;
             round.AdditionalSeconds = extraSeconds;
+            round.PointsNominal = points;
         },
         soundProducer: null,
         existingSoundId: existingSoundId);
