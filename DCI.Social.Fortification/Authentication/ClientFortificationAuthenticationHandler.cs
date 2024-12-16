@@ -53,15 +53,10 @@ internal class ClientFortificationAuthenticationHandler : AuthenticationHandler<
             return AuthenticateResult.Fail("Backy");
         try
         {
-            logger.LogDebug($"Authentication header: {header}");
-            var headerValueBytes = Convert.FromBase64String(header!);
-            logger.LogDebug($"Dun got header value bytes");
-            /*var decryptedHeaderBytes = _clientPublicKey.Decrypt(headerValueBytes, Padding);
-            logger.LogInformation($"Dun decrypted header value");*/
-            var decryptedHeaderValue = UTF8Encoding.UTF8.GetString(headerValueBytes);
-            logger.LogInformation($"Finna compare: {decryptedHeaderValue} == {FortificationAuthenticationConstants.SampleString}");
+            logger.LogInformation($"Authentication header: {header}");
+            logger.LogInformation($"Finna compare: {header} == {FortificationAuthenticationConstants.SampleString}");
 
-            if (decryptedHeaderValue == FortificationAuthenticationConstants.SampleString)
+            if (header == FortificationAuthenticationConstants.SampleString)
             {
                 var principal = new ClaimsPrincipal(
                     identity: new ClaimsIdentity(

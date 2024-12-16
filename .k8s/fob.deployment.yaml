@@ -25,7 +25,7 @@ spec:
 
       containers:
       - name: fob
-        image: docker.io/suneroenne/dcifob:1.0.12
+        image: docker.io/suneroenne/dcifob:1.0.15
         ports:
         - containerPort: 8080
           name: http-fob

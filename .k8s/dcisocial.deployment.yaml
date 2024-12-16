@@ -20,7 +20,7 @@ spec:
             secretName: dcisocial-certs-own          
       containers:
       - name: dcisocial
-        image: docker.io/suneroenne/dcisocial:1.0.21
+        image: docker.io/suneroenne/dcisocial:1.0.25
         ports:
         - containerPort: 8080
           name: http-dcisocial

@@ -54,7 +54,11 @@ internal class FortificationAuthenticationHandler : AuthenticationHandler<Fortif
 
             }
         }
-        catch (Exception) { }
+        catch (Exception ex) {
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<FortificationAuthenticationHandler>>();
+            logger.LogError(ex, "During HQ FOB Authentication");
+
+         }
         return AuthenticateResult.Fail("Nacky");
     }
 

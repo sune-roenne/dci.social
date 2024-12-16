@@ -23,7 +23,7 @@ public class ContestService : IContestService
     private readonly IServiceScopeFactory _scopeFactory;
     private static readonly RSAEncryptionPadding Padding = RSAEncryptionPadding.Pkcs1;
     private readonly string _fobUrl;
-    private readonly string _encryptedHeader;
+    private readonly string _header;
     public event EventHandler<ContestRegistration> OnRegistrationAcknowledged;
     private IReadOnlySet<string> _registeredUsers = new HashSet<string>();
 
@@ -38,9 +38,7 @@ public class ContestService : IContestService
         var privateKeyBytes = Convert.FromBase64String(privateKeyString);
         var privateKey = RSACng.Create();
         privateKey.ImportPkcs8PrivateKey(privateKeyBytes, out _);
-        var unEncryptedBytes = UTF8Encoding.UTF8.GetBytes(FortificationAuthenticationConstants.SampleString);
-        var encryptedBytes = privateKey.Encrypt(unEncryptedBytes, Padding);
-        _encryptedHeader = Convert.ToBase64String(encryptedBytes);
+        _header = FortificationAuthenticationConstants.SampleString;
         InitConnection();
     }
 
@@ -66,7 +64,7 @@ public class ContestService : IContestService
             {
                 
                 if (!opts.Headers.ContainsKey(FortificationAuthenticationConstants.HeaderName))
-                    opts.Headers.Add(FortificationAuthenticationConstants.HeaderName, _encryptedHeader);
+                    opts.Headers.Add(FortificationAuthenticationConstants.HeaderName, _header);
             })
             .WithAutomaticReconnect(reconnectDelays.ToArray());
         _connection = builder.Build();
