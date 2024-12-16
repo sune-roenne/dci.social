@@ -33,6 +33,10 @@ public partial class Home : IDisposable
                 ContestService.OnRegistrationAcknowledged += OnRegistrationAck;
                 _registeredListener = true;
             }
+            if(!_isRegistered)
+            {
+                await ContestService.Register(initials, userName);
+            }
             await InvokeAsync(StateHasChanged);
 
         }
