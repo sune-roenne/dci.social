@@ -16,6 +16,7 @@ public class SocialEncryptedStream : IDisposable
     public SocialEncryptedStream(byte[]? key = null)
     {
         _symmetricAlgorithm = Aes.Create();
+        //_symmetricAlgorithm.Padding = PaddingMode.PKCS7;
         if (key != null)
             _symmetricAlgorithm.Key = key;
     }
@@ -29,8 +30,10 @@ public class SocialEncryptedStream : IDisposable
         {
             var iv = CreateIV(input.Length);
 
-            using (var cryptoStream = new CryptoStream(output, _symmetricAlgorithm.CreateEncryptor(_symmetricAlgorithm.Key, iv), CryptoStreamMode.Write))
+            using (var cryptoStream = new CryptoStream(output, _symmetricAlgorithm.CreateEncryptor(_symmetricAlgorithm.Key, iv), CryptoStreamMode.Write)) {
                 cryptoStream.Write(input, 0, input.Length);
+                cryptoStream.Flush();
+            }
             var returnee = output.ToArray();
             return (returnee, iv);
 
@@ -62,12 +65,19 @@ public class SocialEncryptedStream : IDisposable
 
     public byte[] Decrypt(byte[] input, byte[] iv)
     {
-        using var output = new MemoryStream(input);
-        using var cryptoStream = new CryptoStream(output, _symmetricAlgorithm.CreateDecryptor(_symmetricAlgorithm.Key, iv), CryptoStreamMode.Read);
-        using var reader = new StreamReader(cryptoStream);
-        var readString = reader.ReadToEnd();
-        var returnee = Encoding.UTF8.GetBytes(readString);
-        return returnee;
+        using (var output = new MemoryStream(input))
+        {
+            using (var cryptoStream = new CryptoStream(output, _symmetricAlgorithm.CreateDecryptor(_symmetricAlgorithm.Key, iv), CryptoStreamMode.Read)) {
+                using(var reader = new StreamReader(cryptoStream)) {
+                    cryptoStream.Flush();
+                    var readString = reader.ReadToEnd();
+                    var returnee = Encoding.UTF8.GetBytes(readString);
+                    return returnee;
+
+                }
+            }
+        }
+
     }
 
 

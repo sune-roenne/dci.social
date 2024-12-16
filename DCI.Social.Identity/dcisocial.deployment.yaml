@@ -41,9 +41,11 @@ spec:
         - name: Fortification__ClientPrivateKeyFile
           value: /crt-volume/tls.key
         - name: AzureAd__CallbackPath
-          value: /oauth2-signin
+          value: /blackops2024/oauth2-signin
         - name: Logging__LogLevel__DCI.Social.Identity.Middleware.UrlRedirectRewriteMiddleWare
           value: Debug
+        - name: UI__HostingBasePath
+          value: blackops2024
         - name: UI__FOBUrl
           value: http://fob/
 
