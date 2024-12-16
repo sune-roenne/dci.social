@@ -2,7 +2,6 @@
 using DCI.Social.Fortification;
 using DCI.Social.Fortification.Encryption;
 using DCI.Social.HeadQuarters;
-using DCI.Social.HeadQuarters.FOB;
 using DCI.Social.Spelunking;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -30,7 +29,7 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-var service = app.Services.GetRequiredService<IFOBService>();
+//var service = app.Services.GetRequiredService<IFOBService>();
 
 await Task.Delay(110000);
 

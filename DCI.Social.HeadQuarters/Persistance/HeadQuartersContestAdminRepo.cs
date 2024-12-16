@@ -134,6 +134,7 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
             round.SoundId = soundId;
             round.RoundTimeInSeconds = durationInSeconds;
             round.AdditionalSeconds = extraSeconds;
+            round.PointsNominal = points;
         },
         soundProducer: null,
         existingSoundId: existingSoundId);
@@ -156,6 +157,7 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
             round.RoundName = roundName;
             round.RoundTimeInSeconds = durationInSeconds;
             round.PointsNominal = points;
+            round.Question = question;
         },
         optionsSaver: async (cont, round) =>
         {

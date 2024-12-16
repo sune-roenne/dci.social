@@ -19,4 +19,6 @@ internal class RoundExecutionSelectionDbo
     public DateTime SelectTime { get; set; }
     public bool IsCorrect { get; set; }
 
+    public int Points { get; set; }
+
 }

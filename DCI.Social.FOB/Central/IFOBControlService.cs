@@ -1,4 +1,5 @@
 ﻿using DCI.Social.Domain.Buzzer;
+using DCI.Social.Domain.Contest.Definition;
 using DCI.Social.FOB.Common;
 using DCI.Social.FOB.User;
 
@@ -19,6 +20,12 @@ public interface IFOBControlService
     Task AckRegistration(long userId, string user, string? userName, DateTime registrationTime);
 
     Task DistributeRegistrations(IReadOnlyCollection<string> users);
+
+    Task SubmitContestAnswer(long roundExecutionId, string user, long optionId);
+    Task HandleContestBuzz(long roundExecutionId, string user);
+    Task HandleContestAckBuzz(long roundExecutionId, string user, DateTime registrationTime);
+    Task StartContestRound(long roundExecutionId, string roundName, bool isBuzzerRound, IReadOnlyCollection<RoundOption>? options, int roundIndex, string? question);
+    Task EndContestRound(long roundExecutionId);
 
 
 }

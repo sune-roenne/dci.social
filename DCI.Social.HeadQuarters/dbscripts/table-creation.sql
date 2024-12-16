@@ -96,6 +96,7 @@ create table dcisoc_contex_round_select (
   roundoptionvalue varchar2(200) not null enable,
   selecttime timestamp not null enable,
   iscorrect number(1) not null enable,
+  points number(5) not null enable,
   constraint pk_dcisoc_contex_round_select primary key(roundexecutionid, userid)
 );
 

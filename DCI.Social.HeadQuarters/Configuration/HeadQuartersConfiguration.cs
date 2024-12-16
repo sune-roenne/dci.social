@@ -13,4 +13,6 @@ public class HeadQuartersConfiguration
 
     public HeadQuartersDbConfiguration Db { get; set; }
 
+    public bool Activate { get; set; } = false;
+
 }

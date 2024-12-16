@@ -66,6 +66,19 @@ public class ClientHub : FOBHub
         return 1;
     });
 
+    public Task ClientContestBuzz(ClientContestBuzzMessage message) => WithControllerService(async cont =>
+    {
+        await cont.HandleContestBuzz(message.RoundExecutionId, message.User);
+        return 1;
+    });
+
+    public Task ClientContestRegisterAnswer(ClientContestRegisterAnswerMessage message) => WithControllerService(async cont =>
+    {
+        await cont.SubmitContestAnswer(message.RoundExecutionId, message.User, message.SelectedOptionId);
+        return 1;
+    });
+
+
 
 
 }
