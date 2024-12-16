@@ -203,8 +203,12 @@ internal class HeadQuartersService : IHeadQuartersService
                 try
                 {
                     var shopString = await ReadShopString();
-                    if (shopString != _encryptionService.CurrentSymmetricKey)
+                    var currentKey = _encryptionService.CurrentSymmetricKey;
+                    if (shopString != currentKey)
+                    {
+                        Log($"Newly retrieved shop string: {shopString} did not match current symmetric key: {currentKey}");
                         await SetupShop(ignoreExisting: true);
+                    }
                 }
                 catch (Exception ex)
                 {
