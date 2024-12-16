@@ -5,20 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DCI.Social.Messages.Contest;
-public record ContestStartRoundMessage(
+namespace DCI.Social.Messages.Client.Contest;
+public record ClientContestStartRoundMessage(
     long RoundExecutionId,
     int RoundIndex,
     string RoundName,
     string? Question,
-    IReadOnlyCollection<ContestQuestionOption>? Options,
+    IReadOnlyCollection<ClientContestQuestionOption>? Options,
     bool IsBuzzerRound
     ) : AbstractMessage
 {
     public const string MethodName = "ContestStartRound";
 }
 
-public record ContestQuestionOption(
+public record ClientContestQuestionOption(
     long OptionId,
     string OptionValue
     );

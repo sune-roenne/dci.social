@@ -1,0 +1,13 @@
+﻿@page "/contest"
+@using DCI.Social.Identity
+
+<PageTitle>Black Ops - Operation Red Dawn</PageTitle>
+<div class="dci-social-contest-page">
+    <button 
+        type="button"
+        disabled="@(_isRegistered ? "disabled" : null)"
+        class="dci-social-register-button"
+        @onclick="@OnRegistrationClick"
+    
+    ></button>
+</div>

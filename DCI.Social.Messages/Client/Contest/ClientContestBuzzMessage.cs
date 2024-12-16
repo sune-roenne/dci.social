@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DCI.Social.Messages.Contest;
-public record ContestAckBuzzMessage(
+namespace DCI.Social.Messages.Client.Contest;
+public record ClientContestBuzzMessage(
     long RoundExecutionId,
-    string UserName,
+    string User,
     DateTime RegistrationTime
     ) : AbstractMessage
 {
-    public const string MethodName = "ContestAckBuzz";
+    public const string MethodName = "ClientContestAckBuzz";
 
 
 }

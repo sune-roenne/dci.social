@@ -507,7 +507,7 @@ internal class HeadQuartersService : IHeadQuartersService
                 await _hubConnection.SendAsync(ContestAckRegisterMessage.MethodName, new ContestAckRegisterMessage(result.UserId, result.User, result.UserName, DateTime.Now));
             }
         });
-        _hubConnection.On(ContestRegisterAnswerMessage.MethodName, async (ContestRegisterAnswerMessage mess) =>
+        _hubConnection.On(ClientContestRegisterAnswerMessage.MethodName, async (ClientContestRegisterAnswerMessage mess) =>
         {
             Log($"Received an answer submission for: {mess.User}");
             await CheckAnswer(mess.User, mess.RoundExecutionId, mess.SelectedOptionId);
