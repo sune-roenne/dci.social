@@ -30,7 +30,7 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-var service = app.Services.GetRequiredService<IFOBService>();
+//var service = app.Services.GetRequiredService<IFOBService>();
 
 await Task.Delay(110000);
 

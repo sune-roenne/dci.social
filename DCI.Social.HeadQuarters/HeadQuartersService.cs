@@ -5,21 +5,15 @@ using DCI.Social.Domain.Contest.Execution;
 using DCI.Social.Fortification.Authentication;
 using DCI.Social.Fortification.Encryption;
 using DCI.Social.HeadQuarters.Configuration;
-using DCI.Social.HeadQuarters.FOB;
 using DCI.Social.HeadQuarters.Persistance;
 using DCI.Social.HeadQuarters.Persistance.Model;
 using DCI.Social.Messages.Contest;
-using DCI.Social.Messages.Contest.Buzzer;
 using DCI.Social.Messages.Locations;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DCI.Social.HeadQuarters;
 internal class HeadQuartersService : IHeadQuartersService
@@ -42,7 +36,6 @@ internal class HeadQuartersService : IHeadQuartersService
     private readonly CancellationTokenSource _shutdownSource = new CancellationTokenSource();
     private readonly IDbContextFactory<SocialDbContext> _contextFactory;
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IFortificationEncryptionService _encService;
     private readonly CancellationTokenSource _stopSource = new CancellationTokenSource();
 
     private IReadOnlyDictionary<string, long> _userMap = new Dictionary<string, long>();
@@ -62,20 +55,24 @@ internal class HeadQuartersService : IHeadQuartersService
         IHttpClientFactory clientFactory,
         IFortificationEncryptionService encryptionService,
         IDbContextFactory<SocialDbContext> contextFactory,
-        IServiceScopeFactory scopeFactory,
-        IFortificationEncryptionService encService)
+        IServiceScopeFactory scopeFactory
+        )
     {
-        _encService = encService;
         _contextFactory = contextFactory;
-        _fobUrl = conf.Value.FOBUrl;
-        _clientFactory = clientFactory;
-        _encryptionService = encryptionService;
-        _ = SetupShop();
-        CheckForSymmetricKeyUpdate();
-        _ = ReloadState();
         _scopeFactory = scopeFactory;
-        InitConnection();
-        StartUserRegistrationBroadcast();
+        _ = ReloadState();
+
+        if (conf.Value.Activate)
+        {
+            _fobUrl = conf.Value.FOBUrl;
+            _clientFactory = clientFactory;
+            _encryptionService = encryptionService;
+            _ = SetupShop();
+            CheckForSymmetricKeyUpdate();
+            InitConnection();
+            StartUserRegistrationBroadcast();
+
+        }
     }
 
 
@@ -178,6 +175,7 @@ internal class HeadQuartersService : IHeadQuartersService
         if (_encryptionService.IsInitiatedWithSymmetricKey && !ignoreExisting)
             return;
         var stringResponse = await ReadShopString();
+        Log($"When setting up shop: got string response: {stringResponse}");
         await _encryptionService.DecryptSymmetricKey(stringResponse);
     });
 
@@ -324,7 +322,7 @@ internal class HeadQuartersService : IHeadQuartersService
 
     private string EncryptedHeader()
     {
-        var stringTask = _encService.EncryptStringForTransport(FortificationAuthenticationConstants.SampleString);
+        var stringTask = _encryptionService.EncryptStringForTransport(FortificationAuthenticationConstants.SampleString);
         stringTask.Wait();
         return stringTask.Result;
     }
@@ -343,6 +341,7 @@ internal class HeadQuartersService : IHeadQuartersService
                 if (opts.Headers.ContainsKey(FortificationAuthenticationConstants.HeaderName))
                     opts.Headers.Remove(FortificationAuthenticationConstants.HeaderName);
                 opts.Headers.Add(FortificationAuthenticationConstants.HeaderName, headerValue);
+                Log($"Added header value: {headerValue} to Hub-connection");
             })
             .WithAutomaticReconnect(reconnectDelays.ToArray());
         _hubConnection = builder.Build();
@@ -415,7 +414,12 @@ internal class HeadQuartersService : IHeadQuartersService
         });
     }
 
-
+    private void Log(string logString)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<HeadQuartersService>>();
+        logger.LogInformation(logString);
+    }
 
     private static readonly TimeSpan[] ReconnectDelays = [
                 TimeSpan.FromSeconds(1),

@@ -1,5 +1,4 @@
 ﻿using DCI.Social.HeadQuarters.Configuration;
-using DCI.Social.HeadQuarters.FOB;
 using DCI.Social.HeadQuarters.Persistance;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +18,6 @@ public static class HeadQuartersDependencyInjection
 
     public static WebApplicationBuilder AddHeadQuarters(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton<IFOBService, FOBService>();
         builder.Services.AddSingleton<IHeadQuartersContestAdminRepo, HeadQuartersContestAdminRepo>();
         builder.Services.AddSingleton<IHeadQuartersService, HeadQuartersService>();
         builder.AddHeadQuartersPersistence();
