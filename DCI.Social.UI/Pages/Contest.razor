@@ -1,13 +1,42 @@
 ﻿@page "/contest"
 @using DCI.Social.Identity
 
+
+@attribute [Authorize(Policy = IdentityConstants.IsAuthenticatedPolicyName)]
+
 <PageTitle>Black Ops - Operation Red Dawn</PageTitle>
-<div class="dci-social-contest-page">
-    <button 
-        type="button"
-        disabled="@(_isRegistered ? "disabled" : null)"
-        class="dci-social-register-button"
-        @onclick="@OnRegistrationClick"
-    
-    ></button>
+<div class="dci-social-contest-page @BgClass">
+    @if(_isBuzzerRound) {
+        @if(!_buzzed) {
+            <div class="dci-social-contest-buzzer-container">
+                <button type="button"
+                        class="dci-social-contest-buzzer-button"
+                        @onclick="@(() => OnBuzzerClick())"></button>
+            </div>
+        }
+    }
+    else {
+        <div class="dci-social-contest-question-container">
+            @_currentQuestion
+        </div>
+        <div class="dci-social-contest-question-label labopt-1">
+            @Label1
+        </div>
+        <div class="dci-social-contest-question-label labopt-2">
+            @Label2
+        </div>
+        <div class="dci-social-contest-question-label labopt-3">
+            @Label3
+        </div>
+        <div class="dci-social-contest-question-label labopt-4">
+            @Label4
+        </div>
+
+        <button type="button" class="dci-social-contest-question-button butopt-1" @onclick="@(() => OnButtonClick(0))"></button>
+        <button type="button" class="dci-social-contest-question-button butopt-2" @onclick="@(() => OnButtonClick(1))"></button>
+        <button type="button" class="dci-social-contest-question-button butopt-3" @onclick="@(() => OnButtonClick(2))"></button>
+        <button type="button" class="dci-social-contest-question-button butopt-4" @onclick="@(() => OnButtonClick(3))"></button>
+    }
+
+
 </div>

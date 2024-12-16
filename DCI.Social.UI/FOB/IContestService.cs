@@ -12,8 +12,11 @@ public interface IContestService
     Task Register(string user, string? userName);
     IReadOnlySet<string> RegisteredUsers();
     RoundExecution? CurrentRound { get; }
+    string? CurrentRoundName { get; }
     IReadOnlyCollection<RoundOption>? CurrentRoundOptions { get; }
     int? CurrentRoundIndex { get; }
+    string? CurrentQuestion { get; }
+    bool CurrentIsBuzzer { get; }
     Task Buzz(string user, long roundExecutionId);
     Task SubmitAnswer(string user, long roundExecutionId, long optionId);
 

@@ -15,7 +15,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "launchUrl": "",
+      "launchUrl": "contest",
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost"
     },

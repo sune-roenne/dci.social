@@ -45,11 +45,17 @@ public class ContestService : IContestService
 
     private string FobHubUrl => $"{_fobUrl}{FOBLocations.ClientHub}";
 
-    public RoundExecution? CurrentRound => throw new NotImplementedException();
+    public RoundExecution? CurrentRound => _currentRoundExecution;
 
     public IReadOnlyCollection<RoundOption>? CurrentRoundOptions => throw new NotImplementedException();
 
-    public int? CurrentRoundIndex => throw new NotImplementedException();
+    public int? CurrentRoundIndex => _roundIndex;
+
+    public string? CurrentRoundName => _currentRoundName;
+
+    public string? CurrentQuestion => _currentQuestion;
+
+    public bool CurrentIsBuzzer => _currentRoundIsBuzzer;
 
     public ContestService(IServiceScopeFactory scopeFactory, IOptions<FortificationConfiguration> fortConf, IOptions<UIConfiguration> uiConf)
     {
