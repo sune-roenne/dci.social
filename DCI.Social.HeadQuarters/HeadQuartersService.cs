@@ -2,6 +2,7 @@
 using DCI.Social.Domain.Contest;
 using DCI.Social.Domain.Contest.Definition;
 using DCI.Social.Domain.Contest.Execution;
+using DCI.Social.Domain.User;
 using DCI.Social.Fortification.Authentication;
 using DCI.Social.Fortification.Encryption;
 using DCI.Social.HeadQuarters.Configuration;
@@ -23,7 +24,7 @@ internal class HeadQuartersService : IHeadQuartersService
     public event EventHandler<IReadOnlyCollection<RoundScoring>> OnScorings;
 
 
-
+    private const int MinPoints = 5;
     private const int FollowUpDelayInSeconds = 60;
     private const string SetupShopPath = "hq/setup-shop";
     private string FobHubUrl => $"{_fobUrl}{FOBLocations.HeadQuartersHub}";
@@ -37,11 +38,16 @@ internal class HeadQuartersService : IHeadQuartersService
     private readonly IDbContextFactory<SocialDbContext> _contextFactory;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly CancellationTokenSource _stopSource = new CancellationTokenSource();
+    private readonly SemaphoreSlim _scoringLock = new SemaphoreSlim(1);
+    private List<RoundScoring> _currentRoundScorings = [];
+    private List<Buzz> _currentRoundBuzzes = [];
 
-    private IReadOnlyDictionary<string, long> _userMap = new Dictionary<string, long>();
+    private IReadOnlyDictionary<string, SocialUser> _userMap = new Dictionary<string, SocialUser>();
+
 
     private Contest? _currentContest;
     private ContestExecution? _currentExecution;
+    private RoundExecution? _currentRoundExecution;
     private int? _currentRoundIndex;
     private byte[]? _cachedSoundBytes;
     private string? _cachedSoundBytesFor;
@@ -91,6 +97,9 @@ internal class HeadQuartersService : IHeadQuartersService
         var curRound = _currentContest[_currentRoundIndex.Value];
         if (curRound is BuzzerRound buz)
             CacheSoundBytesFor(buz);
+        _currentRoundExecution = null;
+        _currentRoundScorings = [];
+        _currentRoundBuzzes = [];
         return Task.FromResult(CurrentStatus()!);
     }
 
@@ -103,7 +112,9 @@ internal class HeadQuartersService : IHeadQuartersService
         var curRound = _currentContest[_currentRoundIndex.Value];
         if (curRound is BuzzerRound buz)
             CacheSoundBytesFor(buz);
-
+        _currentRoundExecution = null;
+        _currentRoundScorings = [];
+        _currentRoundBuzzes = [];
         return Task.FromResult(CurrentStatus()!);
     }
 
@@ -121,6 +132,8 @@ internal class HeadQuartersService : IHeadQuartersService
     {
         if(_currentContest != null && _currentExecution != null && _currentRoundIndex != null)
         {
+            _currentRoundScorings = [];
+            _currentRoundBuzzes = [];
             var relRound = _currentContest[_currentRoundIndex.Value];
             await using var cont = await _contextFactory.CreateDbContextAsync();
             var existingExecution = await cont.RoundExecutions
@@ -148,6 +161,7 @@ internal class HeadQuartersService : IHeadQuartersService
             };
             cont.Add(insertee);
             await cont.SaveChangesAsync();
+            _currentRoundExecution = insertee.ToDomain();
         }
 
         return CurrentStatus()!;
@@ -294,28 +308,87 @@ internal class HeadQuartersService : IHeadQuartersService
         }
     }
 
-    public void UpdateUserMapping(IReadOnlyDictionary<string, long> userIdMap)
+    public void UpdateUserMapping(IReadOnlyDictionary<string, SocialUser> userMap)
     {
-        _userMap = userIdMap;
+        _userMap = userMap;
+    }
+
+
+    private async Task RegisterBuzz(long roundExecutionId, string userStringId)
+    {
+        var submitTime = DateTime.Now;
+        if (!_userMap.TryGetValue(userStringId, out var user))
+            return;
+        if (_currentRoundExecution == null || _currentRoundExecution.RoundExecutionId != roundExecutionId)
+            return;
+        _ = Task.Run(async () =>
+        {
+            await _scoringLock.WaitAsync();
+            try
+            {
+                await using var cont = await _contextFactory.CreateDbContextAsync();
+                var existingBuzzes = await cont.RoundExecutionBuzzes
+                    .Where(_ => _.RoundExecutionId == roundExecutionId)
+                    .ToListAsync();
+                if (existingBuzzes.Any(_ => _.UserId == user.ExternalId))
+                    return;
+                var insertee = new RoundExecutionBuzzDbo
+                {
+                    RoundExecutionId = roundExecutionId,
+                    UserId = user.ExternalId,
+                    IsCorrect = false,
+                    BuzzTime = submitTime
+                };
+                cont.Add(insertee);
+                await cont.SaveChangesAsync();
+            }
+            finally
+            {
+                _scoringLock.Release();
+            }
+        });
+        var newBuzz = new Buzz(userStringId, user.UserName, BuzzTime: submitTime);
+        if (_currentRoundBuzzes.Any(_ => _.User == userStringId))
+            return;
+        _currentRoundBuzzes.Add(newBuzz);
+        OnBuzz?.Invoke(this, _currentRoundBuzzes);
     }
 
     public async Task<ExecutionStatus> MarkWinner(long roundExecutionId, long userId)
     {
-        if(_currentContest != null)
+        if(_currentContest != null && _currentRoundIndex != null && _currentRoundExecution != null && _currentRoundExecution.RoundExecutionId == roundExecutionId)
         {
             await using var cont = await _contextFactory.CreateDbContextAsync();
             var buzzes = await cont.RoundExecutionBuzzes
                 .Where(_ => _.RoundExecutionId == roundExecutionId)
                 .ToListAsync();
-            if (!buzzes.Any(_ => _.IsCorrect))
+            var corrects = buzzes
+                .Where(_ => _.IsCorrect)
+                .ToList();
+            if(corrects.Any())
             {
-                var relBuzz = buzzes
-                    .FirstOrDefault(_ => _.UserId == userId);
-                if (relBuzz != null)
+                cont.RemoveRange(corrects);
+                await cont.SaveChangesAsync();
+            }
+            var buzzForUser = buzzes
+                .FirstOrDefault(_ => _.UserId == userId);
+            if (buzzForUser != null)
+            {
+                buzzForUser.IsCorrect = true;
+                cont.Update(buzzForUser);
+                await cont.SaveChangesAsync();
+                var user = _userMap.Values.FirstOrDefault(_ => _.ExternalId == userId);
+                if (user != null)
                 {
-                    relBuzz.IsCorrect = true;
-                    cont.Update(relBuzz);
-                    await cont.SaveChangesAsync();
+                    var round = _currentContest[_currentRoundIndex.Value];
+                    var scoring = new RoundScoring(
+                        ScoringId: 0,
+                        RoundId: _currentRoundExecution.RoundId,
+                        ScoredBy: user,
+                        ScoreTime: buzzForUser.BuzzTime,
+                        Points: round.PointsNominal);
+                    _currentRoundScorings = [scoring];
+                    OnScorings?.Invoke(this, _currentRoundScorings);
                 }
 
             }
@@ -323,6 +396,82 @@ internal class HeadQuartersService : IHeadQuartersService
         }
         return CurrentStatus()!;
     }
+
+
+
+    private async Task CheckAnswer(string userStringId, long roundExecutionId, long selectedOptionId)
+    {
+        Log($"Will check answer for user: {userStringId} for round execution: {roundExecutionId}... Selected: {selectedOptionId}");
+        var submitTime = DateTime.Now;
+        if (_currentContest == null || _currentRoundExecution == null || _currentRoundExecution.RoundExecutionId != roundExecutionId)
+            return;
+        if (!_userMap.TryGetValue(userStringId, out var user))
+            return;
+        await _scoringLock.WaitAsync();
+        try
+        {
+            await using var cont = await _contextFactory.CreateDbContextAsync();
+            var existingAnswers = await cont.RoundExecutionSelections
+                .Where(_ => _.RoundExecutionId == roundExecutionId)
+                .ToListAsync();
+            if (existingAnswers.Any(_ => _.UserId == user.ExternalId))
+                return;
+            var relevantRound = _currentContest.Rounds
+                .FirstOrDefault(_ => _.RoundId == _currentRoundExecution.RoundId);
+            if (relevantRound == null || !(relevantRound is QuestionRound ques))
+                return;
+                
+            var selectedOption = (ques.RoundOptions ?? [])
+                .Where(_ => _.OptionId == selectedOptionId)
+                .FirstOrDefault();
+            if (selectedOption == null)
+                return;
+            var isCorrect = selectedOptionId == ques.CorrectOptionId;
+            var insertee = new RoundExecutionSelectionDbo
+            {
+                UserId = user.ExternalId,
+                RoundExecutionId = roundExecutionId,
+                RoundOptionId = selectedOptionId,
+                RoundOptionValue = selectedOption.OptionName,
+                IsCorrect = isCorrect,
+                SelectTime = submitTime
+            };
+            if (!isCorrect)
+                insertee.Points = 0;
+            else
+            {
+                var previousCorrects = existingAnswers
+                    .Where(_ => _.IsCorrect)
+                    .Count();
+                var points = ques.PointsNominal - previousCorrects;
+                if(points < MinPoints)
+                    points = MinPoints;
+                insertee.Points = points;
+            }
+            cont.Add(insertee);
+            await cont.SaveChangesAsync();
+            if(insertee.IsCorrect)
+            {
+                var scoring = new RoundScoring(
+                    ScoringId: 0L,
+                    RoundId: _currentRoundExecution.RoundId,
+                    ScoredBy: user,
+                    ScoreTime: submitTime,
+                    Points: insertee.Points
+                    );
+                Log($"Recording a scoring for: {userStringId} of {insertee.Points}");
+                _currentRoundScorings.Add(scoring);
+                OnScorings?.Invoke(this, _currentRoundScorings);
+
+            }
+        }
+        finally
+        {
+            _scoringLock?.Release();
+        }
+    }
+
+
 
     private string EncryptedHeader()
     {
@@ -351,11 +500,23 @@ internal class HeadQuartersService : IHeadQuartersService
         _hubConnection = builder.Build();
         _hubConnection.On(ContestRegisterMessage.MethodName, async (ContestRegisterMessage mess) =>
         {
+            Log($"Received a registration message for: {mess.UserName}");
             var result = await RegisterUser(mess.User.ToLower().Trim(), mess.UserName);
             if(result != null)
             {
                 await _hubConnection.SendAsync(ContestAckRegisterMessage.MethodName, new ContestAckRegisterMessage(result.UserId, result.User, result.UserName, DateTime.Now));
             }
+        });
+        _hubConnection.On(ContestRegisterAnswerMessage.MethodName, async (ContestRegisterAnswerMessage mess) =>
+        {
+            Log($"Received an answer submission for: {mess.User}");
+            await CheckAnswer(mess.User, mess.RoundExecutionId, mess.SelectedOptionId);
+        });
+        _hubConnection.On(ContestBuzzMessage.MethodName, async (ContestBuzzMessage mess) =>
+        {
+            Log($"Received a buzz from: {mess.User}");
+            await RegisterBuzz(mess.RoundExecutionId, mess.User);
+            await _hubConnection.SendAsync(ContestAckBuzzMessage.MethodName, new ContestAckBuzzMessage(mess.RoundExecutionId, mess.User, mess.RegistrationTime));
         });
         _ = _hubConnection.StartAsync();
 
@@ -363,18 +524,18 @@ internal class HeadQuartersService : IHeadQuartersService
 
 
 
-    private async Task<ContestRegistration?> RegisterUser(string user, string? userName)
+    private async Task<ContestRegistration?> RegisterUser(string userStringId, string? userName)
     {
-        user = user.ToLower().Trim();
+        userStringId = userStringId.ToLower().Trim();
         if(_currentContest != null)
         {
             using var scope = _scopeFactory.CreateScope();
-            if(_userMap.TryGetValue(user, out var userId))
+            if(_userMap.TryGetValue(userStringId, out var user))
             {
                 var contestRegistrationService = scope.ServiceProvider.GetService<IContestRegistrationService>();
                 if (contestRegistrationService != null)
                 {
-                    var registrationResult = await contestRegistrationService.Register(userId, user, userName, _currentContest.ContestId);
+                    var registrationResult = await contestRegistrationService.Register(user.ExternalId, user.Initials, userName, _currentContest.ContestId);
                     return registrationResult;
                 }
 
