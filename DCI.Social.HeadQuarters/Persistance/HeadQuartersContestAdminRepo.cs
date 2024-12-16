@@ -156,6 +156,7 @@ internal class HeadQuartersContestAdminRepo : IHeadQuartersContestAdminRepo
             round.RoundName = roundName;
             round.RoundTimeInSeconds = durationInSeconds;
             round.PointsNominal = points;
+            round.Question = question;
         },
         optionsSaver: async (cont, round) =>
         {
