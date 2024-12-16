@@ -9,6 +9,9 @@ using ClientAckBuzzMess = DCI.Social.Messages.Client.Buzz.ClientBuzzerAckBuzzMes
 using ClientStartRoundMess = DCI.Social.Messages.Client.Buzz.ClientBuzzerStartRoundMessage;
 using DCI.Social.Messages.Contest;
 using DCI.Social.Messages.Client.Contest;
+using DCI.Social.Domain.Contest.Definition;
+using DCI.Social.Domain.Contest.Execution;
+using Microsoft.Extensions.Options;
 
 namespace DCI.Social.FOB.Central;
 
@@ -62,5 +65,32 @@ internal class FOBControlService : IFOBControlService
     public Task DistributeRegistrations(IReadOnlyCollection<string> users) => WithClientHub(async cont =>
     {
         await cont.Clients.All.SendAsync(ClientContestRegisteredUsersMessage.MethodName, new ClientContestRegisteredUsersMessage(users));
+    });
+
+    public Task SubmitContestAnswer(long roundExecutionId, string user, long optionId) => WithHQHub(async cont =>
+    {
+        await cont.Clients.All.SendAsync(ContestRegisterAnswerMessage.MethodName, new ContestRegisterAnswerMessage(roundExecutionId, user, optionId));
+    });
+
+    public Task HandleContestBuzz(long roundExecutionId, string user) =>  WithHQHub(async cont =>
+    {
+        await cont.Clients.All.SendAsync(ContestBuzzMessage.MethodName, new ContestBuzzMessage(roundExecutionId, user, DateTime.Now));
+    });
+
+    public Task HandleContestAckBuzz(long roundExecutionId, string user, DateTime registrationTime) => WithClientHub(async cont =>
+    {
+        await cont.Clients.All.SendAsync(ClientContestAckBuzzMessage.MethodName, new ClientContestAckBuzzMessage(roundExecutionId, user, registrationTime));
+    });
+
+    public Task StartContestRound(long roundExecutionId, string roundName, bool isBuzzerRound, IReadOnlyCollection<RoundOption>? options, int roundIndex, string? question) => WithClientHub(async cont =>
+    {
+        var messOpts = options == null ? null : options
+           .Select(_ => new ClientContestQuestionOption(_.OptionId, _.OptionName)).ToList();
+        await cont.Clients.All.SendAsync(ClientContestStartRoundMessage.MethodName, new ClientContestStartRoundMessage(roundExecutionId, roundIndex, roundName, question, messOpts, isBuzzerRound));
+    });
+
+    public Task EndContestRound(long roundExecutionId) => WithClientHub(async cont =>
+    {
+        await cont.Clients.All.SendAsync(ClientContestEndRoundMessage.MethodName, new ClientContestEndRoundMessage(roundExecutionId));
     });
 }

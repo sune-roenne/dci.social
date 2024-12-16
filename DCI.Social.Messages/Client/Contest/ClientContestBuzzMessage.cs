@@ -12,7 +12,7 @@ public record ClientContestBuzzMessage(
     DateTime RegistrationTime
     ) : AbstractMessage
 {
-    public const string MethodName = "ClientContestAckBuzz";
+    public const string MethodName = "ClientContestBuzz";
 
 
 }

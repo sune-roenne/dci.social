@@ -1,4 +1,5 @@
 ﻿using DCI.Social.Domain.Buzzer;
+using DCI.Social.Domain.Contest.Definition;
 using DCI.Social.FOB.Central;
 using DCI.Social.FOB.Common;
 using DCI.Social.Fortification.Authentication;
@@ -48,4 +49,27 @@ public class HeadQuartersHub : FOBHub
         await cont.DistributeRegistrations(mess.RegisteredUsers);
         return 0;
     });
+
+    public async Task ContestStartRound(ContestStartRoundMessage mess) => await WithControllerService(async cont =>
+    {
+        var opts = mess.Options == null ? null : mess.Options
+            .Select(_ => new RoundOption(_.OptionId, _.OptionValue))
+            .ToList();
+        await cont.StartContestRound(mess.RoundExecutionId, mess.RoundName, mess.IsBuzzerRound, opts, mess.RoundIndex, mess.Question);
+        return 0;
+    });
+
+    public async Task ContestEndRound(ContestEndRoundMessage mess) => await WithControllerService(async cont =>
+    {
+        await cont.EndContestRound(mess.RoundExecutionId);
+        return 0;
+    });
+
+    public async Task ContestAckBuzz(ContestAckBuzzMessage mess) => await WithControllerService(async cont =>
+    {
+        await cont.HandleContestAckBuzz(mess.RoundExecutionId, mess.UserName, mess.RegistrationTime);
+        return 0;
+    });
+
+
 }
