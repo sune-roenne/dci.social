@@ -66,10 +66,13 @@ internal class HeadQuartersService : IHeadQuartersService
     {
         _contextFactory = contextFactory;
         _scopeFactory = scopeFactory;
+        using var scope = _scopeFactory.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<HeadQuartersService>>();
         _ = ReloadState();
-
+        logger.LogInformation($"Will we init Head Quaters Connection? {conf.Value.Activate}");
         if (conf.Value.Activate)
         {
+            logger.LogInformation($"Yes... we init Head Quaters Connection?");
             _fobUrl = conf.Value.FOBUrl;
             _clientFactory = clientFactory;
             _encryptionService = encryptionService;
@@ -77,8 +80,9 @@ internal class HeadQuartersService : IHeadQuartersService
             CheckForSymmetricKeyUpdate();
             InitConnection();
             StartUserRegistrationBroadcast();
-
         }
+        logger.LogInformation($"Done constructing HQ service");
+
     }
 
 
