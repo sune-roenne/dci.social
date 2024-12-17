@@ -47,7 +47,7 @@ public class ContestService : IContestService
 
     public RoundExecution? CurrentRound => _currentRoundExecution;
 
-    public IReadOnlyCollection<RoundOption>? CurrentRoundOptions => throw new NotImplementedException();
+    public IReadOnlyCollection<RoundOption>? CurrentRoundOptions => _currentOptions?.ToList();
 
     public int? CurrentRoundIndex => _roundIndex;
 
@@ -93,7 +93,7 @@ public class ContestService : IContestService
                 if (!opts.Headers.ContainsKey(FortificationAuthenticationConstants.HeaderName))
                     opts.Headers.Add(FortificationAuthenticationConstants.HeaderName, _header);
             })
-            .WithAutomaticReconnect(reconnectDelays.ToArray());
+            .WithAutomaticReconnect();
         _connection = builder.Build();
         _connection.On(ClientContestAckRegisterMessage.MethodName, async (ClientContestAckRegisterMessage mess) =>
         {
@@ -106,8 +106,17 @@ public class ContestService : IContestService
         _connection.On(ClientContestStartRoundMessage.MethodName, (ClientContestStartRoundMessage mess) => HandleStartMessage(mess));
         _connection.On(ClientContestEndRoundMessage.MethodName, (ClientContestEndRoundMessage mess) => HandleEndMessage(mess));
         _connection.On(ClientContestAckBuzzMessage.MethodName, (ClientContestAckBuzzMessage mess) => HandleAckBuzzMessage(mess));
-        _connection.StartAsync();
-        Log("Inited FOB connection");
+        _ = Task.Run(async () => {
+            try {
+                await _connection.StartAsync();
+                Log("Inited FOB connection");
+
+            }
+            catch(Exception e) {
+                Log("Error while initing connection: " + e.Message);
+            }
+
+        });
 
     }
 
@@ -143,6 +152,7 @@ public class ContestService : IContestService
         _currentRoundName = mess.RoundName;
         _currentQuestion = mess.Question;
         _currentRoundIsBuzzer = mess.IsBuzzerRound;
+        OnRoundBegin?.Invoke(this, _currentRoundExecution);
     }
     private void HandleEndMessage(ClientContestEndRoundMessage mess)
     {
@@ -150,6 +160,7 @@ public class ContestService : IContestService
 
         _currentRoundExecution = null;
         _currentOptions = null;
+        OnRoundEnd?.Invoke(this, _currentRoundExecution?.RoundExecutionId ?? -1L);
     }
 
 
@@ -203,29 +214,7 @@ public class ContestService : IContestService
                 TimeSpan.FromSeconds(2),
                 TimeSpan.FromSeconds(2),
                 TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(8),
-                TimeSpan.FromSeconds(16),
-                TimeSpan.FromSeconds(16),
-                TimeSpan.FromSeconds(32),
-                TimeSpan.FromSeconds(32),
-                TimeSpan.FromSeconds(32),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64)
+                TimeSpan.FromSeconds(4)
     ];
 
     private void Log(string mess) {

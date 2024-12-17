@@ -35,7 +35,7 @@ public class UrlRedirectRewriteMiddleWare {
             context.Request.Headers["X-Forwarded-Proto"]="https";
             context.Request.Headers["X-Original-Proto"]="https";
         }
-        if(_basePath != null) {
+        /*if(_basePath != null) {
             var lastSlash = _redirectPath.LastIndexOf("/");
             var redirUrlEnding = _redirectPath.Substring(lastSlash);
             if(requestPath.EndsWith(redirUrlEnding.ToLower())) {
@@ -58,7 +58,7 @@ public class UrlRedirectRewriteMiddleWare {
                 if(editedRequestPath.StartsWith("//"))
                    editedRequestPath = editedRequestPath.Substring(1, editedRequestPath.Length - 1);
                 _logger.LogInformation($"Changed request path: {requestPath} to: {editedRequestPath}");
-            }*/
+            }
 
 
 
@@ -70,6 +70,8 @@ public class UrlRedirectRewriteMiddleWare {
             .Select(_ => (_.Key, (string?) _.Value.ToString()))
             .AsLoggableString();
         _logger.LogInformation(headersString);
+
+        */
 
 
         await _next(context);
