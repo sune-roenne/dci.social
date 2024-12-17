@@ -1,4 +1,5 @@
 ﻿using DCI.Social.Domain.Contest.Execution;
+using DCI.Social.Domain.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,7 @@ public interface IContestRegistrationService
 {
     Task<ContestRegistration?> Register(long userId, string user, string? userName, long contest);
     Task<IReadOnlyCollection<ContestRegistration>> LoadRegistrations();
+
+    Task<IReadOnlyCollection<SocialUser>> LoadSocialUsers();
 
 }

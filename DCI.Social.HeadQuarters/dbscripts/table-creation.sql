@@ -90,7 +90,7 @@ create index idx_dcisoc_contex_round_rnd on dcisoc_contex_round(roundid);
 
 
 create table dcisoc_contex_round_select (
-  roundexecutionid number(10) generated always as identity not null enable,
+  roundexecutionid number(10) not null enable,
   userid number(10) not null enable,
   roundoptionid number(10) not null enable,
   roundoptionvalue varchar2(200) not null enable,
@@ -101,14 +101,14 @@ create table dcisoc_contex_round_select (
 );
 
 create table dcisoc_contex_round_buzz (
-  roundexecutionid number(10) generated always as identity not null enable,
+  roundexecutionid number(10) not null enable,
   userid number(10) not null enable,
   buzztime timestamp not null enable,
   iscorrect number(1) not null enable,
   constraint pk_dcisoc_contex_round_buzz primary key(roundexecutionid, userid)
 );
 
---drop table dcisoc_contex_round;
+drop table dcisoc_contex_round_select;
 
 
 

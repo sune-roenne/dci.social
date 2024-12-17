@@ -31,10 +31,6 @@ internal class HeadQuartersService : IHeadQuartersService
 
 
     private readonly string _fobUrl;
-    private readonly IHttpClientFactory _clientFactory;
-    private readonly IFortificationEncryptionService _encryptionService;
-    private readonly SemaphoreSlim _shopLock = new SemaphoreSlim(1);
-    private readonly CancellationTokenSource _shutdownSource = new CancellationTokenSource();
     private readonly IDbContextFactory<SocialDbContext> _contextFactory;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly CancellationTokenSource _stopSource = new CancellationTokenSource();
@@ -68,16 +64,23 @@ internal class HeadQuartersService : IHeadQuartersService
         _scopeFactory = scopeFactory;
         using var scope = _scopeFactory.CreateScope();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<HeadQuartersService>>();
+        var regService = scope.ServiceProvider.GetService<IContestRegistrationService>();
         _ = ReloadState();
+        if(regService!= null)
+        {
+            _ = Task.Run(async () =>
+            {
+                _userMap = (await regService.LoadSocialUsers())
+                   .GroupBy(_ => _.Initials.ToLower())
+                   .ToDictionary(_ => _.Key, _ => _.First());
+            });
+
+        }
         logger.LogInformation($"Will we init Head Quaters Connection? {conf.Value.Activate}");
         if (conf.Value.Activate)
         {
             logger.LogInformation($"Yes... we init Head Quaters Connection?");
             _fobUrl = conf.Value.FOBUrl;
-            _clientFactory = clientFactory;
-            _encryptionService = encryptionService;
-            _ = SetupShop();
-            CheckForSymmetricKeyUpdate();
             InitConnection();
             StartUserRegistrationBroadcast();
         }
@@ -166,6 +169,27 @@ internal class HeadQuartersService : IHeadQuartersService
             cont.Add(insertee);
             await cont.SaveChangesAsync();
             _currentRoundExecution = insertee.ToDomain();
+            if (_hubConnection != null && _hubConnection.State == HubConnectionState.Connected)
+            {
+                try
+                {
+                    var round = _currentContest[_currentRoundIndex.Value];
+                    await _hubConnection.SendAsync(ContestStartRoundMessage.MethodName, new ContestStartRoundMessage(
+                        RoundExecutionId: _currentRoundExecution.RoundExecutionId,
+                        RoundIndex: _currentRoundIndex.Value,
+                        RoundName: round.RoundName,
+                        Question: round is QuestionRound ques ? ques.Question : null,
+                        Options: round is QuestionRound q ? (q.RoundOptions ?? []).Select(_ => new ContestQuestionOption(_.OptionId, _.OptionName)).ToList() : null,
+                        IsBuzzerRound: round is BuzzerRound));
+                }
+                catch(Exception ex)
+                {
+                    Log($"Sending start message to FOB presented problematic: {ex.Message}");
+                }
+
+            }
+
+
         }
 
         return CurrentStatus()!;
@@ -183,67 +207,6 @@ internal class HeadQuartersService : IHeadQuartersService
         return returnee?.SoundBytes;
     }
 
-
-    private string SetupShopUrl => $"{_fobUrl}{SetupShopPath}";
-
-
-
-    private async Task SetupShop(bool ignoreExisting = false) => await Locked(async () =>
-    {
-        if (_encryptionService.IsInitiatedWithSymmetricKey && !ignoreExisting)
-            return;
-        var stringResponse = await ReadShopString();
-        Log($"When setting up shop: got string response: {stringResponse}");
-        await _encryptionService.DecryptSymmetricKey(stringResponse);
-    });
-
-    private async Task Locked(Func<Task> toPerform)
-    {
-        await _shopLock.WaitAsync();
-        try
-        {
-            await toPerform();
-        }
-        finally
-        {
-            _shopLock.Release();
-        }
-    }
-    private void CheckForSymmetricKeyUpdate()
-    {
-
-        _ = Task.Run(async () =>
-        {
-            var delay = TimeSpan.FromSeconds(FollowUpDelayInSeconds);
-            while (!_shutdownSource.IsCancellationRequested)
-            {
-                await Task.Delay(delay);
-                try
-                {
-                    var shopString = await ReadShopString();
-                    var currentKey = _encryptionService.CurrentSymmetricKey;
-                    if (shopString != currentKey)
-                    {
-                        Log($"Newly retrieved shop string: {shopString} did not match current symmetric key: {currentKey}");
-                        await SetupShop(ignoreExisting: true);
-                    }
-                }
-                catch (Exception ex)
-                {
-
-                }
-            }
-        });
-    }
-
-    private async Task<string> ReadShopString()
-    {
-        using var client = _clientFactory.CreateClient();
-        var url = SetupShopUrl;
-        var response = await client.GetAsync(url);
-        var stringResponse = await response.Content.ReadAsStringAsync();
-        return stringResponse;
-    }
 
     public ExecutionStatus? CurrentStatus()
     {
@@ -358,13 +321,13 @@ internal class HeadQuartersService : IHeadQuartersService
         OnBuzz?.Invoke(this, _currentRoundBuzzes);
     }
 
-    public async Task<ExecutionStatus> MarkWinner(long roundExecutionId, long userId)
+    public async Task<ExecutionStatus> MarkWinner(long userId)
     {
-        if(_currentContest != null && _currentRoundIndex != null && _currentRoundExecution != null && _currentRoundExecution.RoundExecutionId == roundExecutionId)
+        if(_currentContest != null && _currentRoundIndex != null && _currentRoundExecution != null)
         {
             await using var cont = await _contextFactory.CreateDbContextAsync();
             var buzzes = await cont.RoundExecutionBuzzes
-                .Where(_ => _.RoundExecutionId == roundExecutionId)
+                .Where(_ => _.RoundExecutionId == _currentRoundExecution.RoundExecutionId)
                 .ToListAsync();
             var corrects = buzzes
                 .Where(_ => _.IsCorrect)
@@ -477,30 +440,21 @@ internal class HeadQuartersService : IHeadQuartersService
 
 
 
-    private string EncryptedHeader()
-    {
-        var stringTask = _encryptionService.EncryptStringForTransport(FortificationAuthenticationConstants.SampleString);
-        stringTask.Wait();
-        return stringTask.Result;
-    }
 
 
     private void InitConnection()
     {
-        var reconnectDelays = new List<TimeSpan>();
-        for (int i = 0; i < 100; i++)
-            reconnectDelays.AddRange(ReconnectDelays);
-
+        
         var builder = new HubConnectionBuilder()
             .WithUrl(FobHubUrl, opts =>
             {
-                var headerValue = EncryptedHeader();
+                var headerValue = FortificationAuthenticationConstants.SampleString;
                 if (opts.Headers.ContainsKey(FortificationAuthenticationConstants.HeaderName))
                     opts.Headers.Remove(FortificationAuthenticationConstants.HeaderName);
                 opts.Headers.Add(FortificationAuthenticationConstants.HeaderName, headerValue);
                 Log($"Added header value: {headerValue} to Hub-connection");
             })
-            .WithAutomaticReconnect(reconnectDelays.ToArray());
+            .WithAutomaticReconnect();
         _hubConnection = builder.Build();
         _hubConnection.On(ContestRegisterMessage.MethodName, async (ContestRegisterMessage mess) =>
         {
@@ -522,7 +476,18 @@ internal class HeadQuartersService : IHeadQuartersService
             await RegisterBuzz(mess.RoundExecutionId, mess.User);
             await _hubConnection.SendAsync(ContestAckBuzzMessage.MethodName, new ContestAckBuzzMessage(mess.RoundExecutionId, mess.User, mess.RegistrationTime));
         });
-        _ = _hubConnection.StartAsync();
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _hubConnection.StartAsync();
+            }
+            catch(Exception ex)
+            {
+                Log($"Problem with starting FOB connection {ex.Message}");
+            }
+
+        });
 
     }
 
@@ -589,37 +554,6 @@ internal class HeadQuartersService : IHeadQuartersService
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<HeadQuartersService>>();
         logger.LogInformation(logString);
     }
-
-    private static readonly TimeSpan[] ReconnectDelays = [
-                TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(2),
-                TimeSpan.FromSeconds(2),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(4),
-                TimeSpan.FromSeconds(8),
-                TimeSpan.FromSeconds(16),
-                TimeSpan.FromSeconds(16),
-                TimeSpan.FromSeconds(32),
-                TimeSpan.FromSeconds(32),
-                TimeSpan.FromSeconds(32),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64),
-                TimeSpan.FromSeconds(64)
-        ];
 
 
 

@@ -25,7 +25,7 @@ public interface IHeadQuartersService
 
     Task ReloadState();
 
-    Task<ExecutionStatus> MarkWinner(long roundExecutionId, long userId);
+    Task<ExecutionStatus> MarkWinner(long userId);
 
     event EventHandler<IReadOnlyCollection<Buzz>> OnBuzz;
 
