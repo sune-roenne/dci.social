@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace DCI.Social.FOB.HeadQuarters;
 
-[Authorize(AuthenticationSchemes = FortificationAuthenticationConstants.AuthenticationType)]
+//[Authorize(AuthenticationSchemes = FortificationAuthenticationConstants.AuthenticationType)]
 public class HeadQuartersHub : FOBHub
 {
     private readonly IServiceScopeFactory _scopeFactory;

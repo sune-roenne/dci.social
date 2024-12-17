@@ -38,8 +38,13 @@ public partial class Contest : IDisposable
             ContestService.OnRoundBegin += OnRoundBegin;
             ContestService.OnRoundEnd += OnRoundEnd;
             _hasRegistered = true;
-            _ = InvokeAsync(StateHasChanged);
         }
+        _currentRoundExecutionId = ContestService.CurrentRound?.RoundExecutionId;
+        _currentQuestion = ContestService.CurrentQuestion;
+        _currentRoundIndex = ContestService.CurrentRoundIndex;
+        _currentRoundOptions = ContestService.CurrentRoundOptions?.ToArray();
+        _ = InvokeAsync(StateHasChanged);
+
     }
 
     private void OnBuzzAcked(object? sender, IReadOnlySet<string> ackedUsers)
@@ -104,7 +109,7 @@ public partial class Contest : IDisposable
 
     private void OnBuzzerClick()
     {
-        Log("Asked to buzz");
+        Log($"Asked to buzz. User is: {User?.Initials} current round execution ID is: {_currentRoundExecutionId}");
         if (User != null && _currentRoundExecutionId != null)
         {
             Log("Going to send buzz");

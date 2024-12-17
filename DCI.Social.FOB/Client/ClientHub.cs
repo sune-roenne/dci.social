@@ -11,7 +11,7 @@ using DCI.Social.Domain.Buzzer;
 
 
 namespace DCI.Social.FOB.Client;
-[Authorize(AuthenticationSchemes = FortificationAuthenticationConstants.ClientAuthenticationType)]
+//[Authorize(AuthenticationSchemes = FortificationAuthenticationConstants.ClientAuthenticationType)]
 public class ClientHub : FOBHub
 {
 
